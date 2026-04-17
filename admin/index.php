@@ -141,17 +141,22 @@ function get_transaction_for_session($sid, $transactions) {
     <style>
         body { background-color: #0a0a0a; color: #f3f4f6; font-family: 'Inter', sans-serif; }
         .glass-panel { background: rgba(31, 41, 55, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(75, 85, 99, 0.4); }
+        .flash { animation: flash 0.6s ease; }
+        @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.4} }
     </style>
 </head>
 <body class="p-4 sm:p-8">
 
     <div class="max-w-7xl mx-auto space-y-8">
-        
+
         <!-- Header -->
         <div class="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-6 rounded-xl">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl">🚀</div>
-                <h1 class="text-3xl font-bold">Painel Analítico</h1>
+                <div>
+                    <h1 class="text-3xl font-bold">Painel Analítico</h1>
+                    <p class="text-xs text-gray-500 mt-0.5">Ao vivo &mdash; atualiza a cada 3s &bull; <span id="last-update">--:--:--</span></p>
+                </div>
             </div>
             <div class="flex items-center gap-4">
                 <a href="?logout=1" class="text-gray-400 hover:text-white transition">Sair</a>
@@ -176,28 +181,28 @@ function get_transaction_for_session($sid, $transactions) {
             <div class="glass-panel p-6 rounded-xl relative overflow-hidden group">
                 <div class="absolute right-0 top-0 w-24 h-24 bg-blue-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
                 <h3 class="text-gray-400 text-sm font-semibold mb-1">Total de Visitantes</h3>
-                <p class="text-4xl font-bold"><?= number_format($total_visitors, 0, ',', '.') ?></p>
+                <p id="m-visitors" class="text-4xl font-bold"><?= number_format($total_visitors, 0, ',', '.') ?></p>
             </div>
-            
+
             <div class="glass-panel p-6 rounded-xl border-l-4 border-l-green-500 relative overflow-hidden">
                 <div class="absolute top-4 right-4 flex h-3 w-3">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                 </div>
                 <h3 class="text-gray-400 text-sm font-semibold mb-1">Usuários ao Vivo</h3>
-                <p class="text-4xl font-bold text-green-400"><?= count($live_users) ?></p>
+                <p id="m-live" class="text-4xl font-bold text-green-400"><?= count($live_users) ?></p>
             </div>
 
             <div class="glass-panel p-6 rounded-xl relative">
                 <h3 class="text-gray-400 text-sm font-semibold mb-1">Vendas (Pagos)</h3>
-                <p class="text-4xl font-bold"><?= $funnel['pagos'] ?></p>
-                <div class="mt-2 text-xs text-gray-500">Valor Pago: <span class="text-green-400 font-bold">€ <?= number_format($funnel['valor_pago'], 2, ',', '.') ?></span></div>
+                <p id="m-pagos" class="text-4xl font-bold"><?= $funnel['pagos'] ?></p>
+                <div class="mt-2 text-xs text-gray-500">Valor Pago: <span id="m-valor-pago" class="text-green-400 font-bold">€ <?= number_format($funnel['valor_pago'], 2, ',', '.') ?></span></div>
             </div>
 
             <div class="glass-panel p-6 rounded-xl relative">
                 <h3 class="text-gray-400 text-sm font-semibold mb-1">Gerados (Pendente)</h3>
-                <p class="text-4xl font-bold"><?= $funnel['gerados'] ?></p>
-                <div class="mt-2 text-xs text-gray-500">Valor Gerado: € <?= number_format($funnel['valor_gerado'], 2, ',', '.') ?></div>
+                <p id="m-gerados" class="text-4xl font-bold"><?= $funnel['gerados'] ?></p>
+                <div class="mt-2 text-xs text-gray-500">Valor Gerado: <span id="m-valor-gerado">€ <?= number_format($funnel['valor_gerado'], 2, ',', '.') ?></span></div>
             </div>
         </div>
 
@@ -206,20 +211,20 @@ function get_transaction_for_session($sid, $transactions) {
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="glass-panel p-5 rounded-lg border-l-4 border-l-blue-500">
                 <p class="text-sm text-gray-400">Página Principal</p>
-                <p class="text-3xl font-bold mt-1"><?= $funnel['index'] ?></p>
+                <p id="f-index" class="text-3xl font-bold mt-1"><?= $funnel['index'] ?></p>
             </div>
             <div class="glass-panel p-5 rounded-lg border-l-4 border-l-purple-500">
                 <p class="text-sm text-gray-400">Escolher Chip</p>
-                <p class="text-3xl font-bold mt-1"><?= $funnel['chip'] ?></p>
+                <p id="f-chip" class="text-3xl font-bold mt-1"><?= $funnel['chip'] ?></p>
             </div>
             <div class="glass-panel p-5 rounded-lg border-l-4 border-l-pink-500">
                 <p class="text-sm text-gray-400">Checkout</p>
-                <p class="text-3xl font-bold mt-1"><?= $funnel['checkout'] ?></p>
+                <p id="f-checkout" class="text-3xl font-bold mt-1"><?= $funnel['checkout'] ?></p>
             </div>
         </div>
 
         <!-- Usuários Ao Vivo -->
-        <h2 class="text-xl font-bold mt-8 mb-4 border-b border-gray-800 pb-2">🟢 Usuários Ao Vivo (<span class="text-green-400"><?= count($live_users) ?></span>)</h2>
+        <h2 class="text-xl font-bold mt-8 mb-4 border-b border-gray-800 pb-2">🟢 Usuários Ao Vivo (<span id="live-count-title" class="text-green-400"><?= count($live_users) ?></span>)</h2>
         <div class="glass-panel rounded-xl overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm whitespace-nowrap">
@@ -227,26 +232,25 @@ function get_transaction_for_session($sid, $transactions) {
                         <tr>
                             <th class="px-6 py-4 font-medium">IP / Localização</th>
                             <th class="px-6 py-4 font-medium">Página Atual</th>
-                            <th class="px-6 py-4 font-medium">Tempo</th>
+                            <th class="px-6 py-4 font-medium">Status</th>
                             <th class="px-6 py-4 font-medium">Status Pagamento</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-800/50">
+                    <tbody id="live-tbody" class="divide-y divide-gray-800/50">
                         <?php if (count($live_users) === 0): ?>
                         <tr><td colspan="4" class="text-center py-6 text-gray-500">Nenhum usuário online no momento.</td></tr>
                         <?php endif; ?>
-                        
-                        <?php foreach($live_users as $lu): 
-                            $tx = get_transaction_for_session($lu['session_id'], $transactions);
-                            $loc = isset($lu['location']) ? $lu['location'] : 'Desconhecido';
+                        <?php foreach($live_users as $lu):
+                            $tx  = get_transaction_for_session($lu['session_id'], $transactions);
+                            $loc = $lu['location'] ?? 'Desconhecido';
                         ?>
                         <tr class="hover:bg-white/[0.02] transition-colors">
                             <td class="px-6 py-4">
-                                <div class="font-medium"><?= $lu['ip'] ?? 'Desconhecido' ?></div>
-                                <div class="text-xs text-gray-500"><?= $loc ?></div>
+                                <div class="font-medium"><?= htmlspecialchars($lu['ip'] ?? 'Desconhecido') ?></div>
+                                <div class="text-xs text-gray-500"><?= htmlspecialchars($loc) ?></div>
                             </td>
                             <td class="px-6 py-4 text-blue-400">/<?= htmlspecialchars($lu['current_page']) ?></td>
-                            <td class="px-6 py-4">Online (Visto agorinha)</td>
+                            <td class="px-6 py-4"><span class="text-green-400 text-xs font-semibold">● Online</span></td>
                             <td class="px-6 py-4">
                                 <?php if ($tx): ?>
                                     <div class="flex flex-col gap-1">
@@ -264,7 +268,7 @@ function get_transaction_for_session($sid, $transactions) {
             </div>
         </div>
 
-        <!-- Clientes / Leads (Começaram a digitar os dados) -->
+        <!-- Leads -->
         <h2 class="text-xl font-bold mt-8 mb-4 border-b border-gray-800 pb-2">📋 Leads (Informações de Clientes)</h2>
         <div class="glass-panel rounded-xl overflow-hidden">
             <div class="overflow-x-auto">
@@ -277,15 +281,13 @@ function get_transaction_for_session($sid, $transactions) {
                             <th class="px-6 py-4 font-medium">Status Checkout</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-800/50">
-                        <?php 
-                        // sort leads by newest
-                        usort($leads, function($a, $b) { return $b['updated_at'] <=> $a['updated_at']; });
+                    <tbody id="leads-tbody" class="divide-y divide-gray-800/50">
+                        <?php
+                        usort($leads, fn($a, $b) => $b['updated_at'] <=> $a['updated_at']);
                         if (count($leads) === 0): ?>
                         <tr><td colspan="4" class="text-center py-6 text-gray-500">Nenhum dado capturado ainda.</td></tr>
                         <?php endif; ?>
-                        
-                        <?php foreach($leads as $l): 
+                        <?php foreach($leads as $l):
                             if (empty($l['name']) && empty($l['email']) && empty($l['document']) && empty($l['phone'])) continue;
                             $tx = get_transaction_for_session($l['session_id'], $transactions);
                         ?>
@@ -298,9 +300,7 @@ function get_transaction_for_session($sid, $transactions) {
                                 <div><?= htmlspecialchars($l['email'] ?: '---') ?></div>
                                 <div class="text-gray-400"><?= htmlspecialchars($l['phone'] ?: '---') ?></div>
                             </td>
-                            <td class="px-6 py-4 text-gray-400">
-                                <?= date('d/m/Y H:i:s', $l['updated_at']) ?>
-                            </td>
+                            <td class="px-6 py-4 text-gray-400"><?= date('d/m/Y H:i:s', $l['updated_at']) ?></td>
                             <td class="px-6 py-4">
                                 <?php if ($tx): ?>
                                     <div class="flex flex-col gap-1 items-start">
@@ -320,21 +320,112 @@ function get_transaction_for_session($sid, $transactions) {
 
     </div>
 
-    <!-- Auto Refresh Scripts -->
     <script>
-        // Check for updates every 10 seconds silently
-        setInterval(() => {
-            fetch(window.location.href)
-            .then(res => res.text())
-            .then(html => {
-                const doc = new DOMParser().parseFromString(html, "text/html");
-                const newBody = doc.body.innerHTML;
-                if (newBody && document.body.innerHTML !== newBody) {
-                    // Update only if we are not interacting with forms maybe, but for pure dashboard it's fine
-                    document.body.innerHTML = newBody;
-                }
-            });
-        }, 10000);
+    function fmt(n) {
+        return Number(n).toLocaleString('pt-PT', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    }
+    function fmtEur(n) {
+        return '€ ' + Number(n).toLocaleString('pt-PT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+    function flash(el) {
+        el.classList.remove('flash');
+        void el.offsetWidth;
+        el.classList.add('flash');
+    }
+    function set(id, val) {
+        const el = document.getElementById(id);
+        if (el && el.textContent !== String(val)) { el.textContent = val; flash(el); }
+    }
+    function statusBadge(s) {
+        if (s === 'COMPLETED') return '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-900 text-green-300">PAGO</span>';
+        if (s === 'pending')   return '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-900 text-yellow-300">GERADO</span>';
+        return '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-700 text-gray-300">' + s + '</span>';
+    }
+
+    function renderLive(users) {
+        const tbody = document.getElementById('live-tbody');
+        if (!users.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-gray-500">Nenhum usuário online no momento.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = users.map(u => `
+            <tr class="hover:bg-white/[0.02] transition-colors">
+                <td class="px-6 py-4">
+                    <div class="font-medium">${u.ip}</div>
+                    <div class="text-xs text-gray-500">${u.location}</div>
+                </td>
+                <td class="px-6 py-4 text-blue-400">/${u.current_page}</td>
+                <td class="px-6 py-4"><span class="text-green-400 text-xs font-semibold">● Online</span></td>
+                <td class="px-6 py-4">${u.tx_status
+                    ? `<div class="flex flex-col gap-1">${statusBadge(u.tx_status)}<div class="text-xs text-gray-400">${fmtEur(u.tx_amount)}</div></div>`
+                    : '<span class="text-gray-600 text-xs">-</span>'
+                }</td>
+            </tr>`).join('');
+    }
+
+    function renderLeads(leads) {
+        const tbody = document.getElementById('leads-tbody');
+        if (!leads.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-gray-500">Nenhum dado capturado ainda.</td></tr>';
+            return;
+        }
+        function esc(s) { const d = document.createElement('div'); d.textContent = s||''; return d.innerHTML; }
+        function fmtDate(ts) {
+            const d = new Date(ts * 1000);
+            return d.toLocaleDateString('pt-PT') + ' ' + d.toLocaleTimeString('pt-PT');
+        }
+        tbody.innerHTML = leads.map(l => `
+            <tr class="hover:bg-white/[0.02] transition-colors">
+                <td class="px-6 py-4">
+                    <div class="font-bold text-white">${esc(l.name||'Sem nome')}</div>
+                    <div class="text-xs text-gray-400">NIF/CPF: ${esc(l.document||'---')}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <div>${esc(l.email||'---')}</div>
+                    <div class="text-gray-400">${esc(l.phone||'---')}</div>
+                </td>
+                <td class="px-6 py-4 text-gray-400">${fmtDate(l.updated_at)}</td>
+                <td class="px-6 py-4">${l.tx_status
+                    ? `<div class="flex flex-col gap-1 items-start">${statusBadge(l.tx_status)}<div class="text-xs text-gray-400">${fmtEur(l.tx_amount)}</div></div>`
+                    : '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-700 text-gray-300">ABANDONOU</span>'
+                }</td>
+            </tr>`).join('');
+    }
+
+    async function refresh() {
+        try {
+            const res = await fetch('data.php', {credentials: 'same-origin'});
+            if (!res.ok) return;
+            const d = await res.json();
+
+            set('m-visitors', fmt(d.total_visitors));
+            set('m-live',     d.live_count);
+            set('m-pagos',    d.funnel.pagos);
+            set('m-gerados',  d.funnel.gerados);
+
+            const vpEl = document.getElementById('m-valor-pago');
+            const vgEl = document.getElementById('m-valor-gerado');
+            const vpNew = fmtEur(d.funnel.valor_pago);
+            const vgNew = '€ ' + Number(d.funnel.valor_gerado).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2});
+            if (vpEl && vpEl.textContent !== vpNew) { vpEl.textContent = vpNew; flash(vpEl); }
+            if (vgEl && vgEl.textContent !== vgNew) { vgEl.textContent = vgNew; flash(vgEl); }
+
+            set('f-index',    d.funnel.index);
+            set('f-chip',     d.funnel.chip);
+            set('f-checkout', d.funnel.checkout);
+            set('live-count-title', d.live_count);
+
+            renderLive(d.live_users);
+            renderLeads(d.leads);
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('pt-PT');
+            document.getElementById('last-update').textContent = timeStr;
+        } catch(e) {}
+    }
+
+    refresh();
+    setInterval(refresh, 3000);
     </script>
 </body>
 </html>

@@ -3,5 +3,10 @@
         "session_id": "366007f1-8911-4b58-b926-537e08cb1055",
         "event_type": "index",
         "created_at": 1776447364
+    },
+    {
+        "session_id": "a49561e8-a35f-4595-8378-01315ed028d5",
+        "event_type": "index",
+        "created_at": 1776447673
     }
 ]
