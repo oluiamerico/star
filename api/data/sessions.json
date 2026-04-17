@@ -3,9 +3,9 @@
         "session_id": "0b8e001f-566d-4baf-bdd4-132bf164d6a2",
         "ip": "::1",
         "location": "Localhost",
-        "current_page": "unknown",
+        "current_page": "index",
         "created_at": 1776446691,
-        "last_ping": 1776446731
+        "last_ping": 1776448424
     },
     {
         "session_id": "366007f1-8911-4b58-b926-537e08cb1055",

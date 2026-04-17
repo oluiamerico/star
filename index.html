@@ -763,7 +763,8 @@
                             2 meses de uso grátis. A primeira mensalidade só será cobrada após esse período. Cancele
                             quando quiser.</p>
                     </div>
-                    <div class="mt-10 text-center"><a href="./escolher-chip/index.html?plan=150gb" data-slot="button"
+                    <div class="mt-10 text-center" id="desktop-cta-container">
+                        <a href="./escolher-chip/index.html?plan=450gb" id="main-cta-btn" data-slot="button"
                             class="inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive rounded-md has-[>svg]:px-4 bg-foreground text-background hover:bg-foreground/90 font-semibold text-lg px-12 py-6 h-auto group"
                             onclick="if(typeof fbq !== 'undefined') fbq('track', 'ViewContent');">Comprar
                             Cartão SIM Agora<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -823,10 +824,29 @@
     <script>self.__next_f.push([1, "28:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"}],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}]]\n"])</script>
     <script>self.__next_f.push([1, "2b:I[76629,[\"/_next/static/chunks/3337476739009024.js\",\"/_next/static/chunks/796e7f5bb07ad38d.js\"],\"IconMark\"]\n2a:[[\"$\",\"title\",\"0\",{\"children\":\"eSIM Virtual Starlink | Internet Via Satélite no Telemóvel\"}],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"Transforme seu telemóvel em um modem via satélite com a tecnologia Direct-to-Cell. Pré-liberação exclusiva no Brasil. Use por 2 meses grátis.\"}],[\"$\",\"meta\",\"2\",{\"name\":\"generator\",\"content\":\"v0.app\"}],[\"$\",\"link\",\"3\",{\"rel\":\"icon\",\"href\":\"/icon-light-32x32.png\",\"media\":\"(prefers-color-scheme: light)\"}],[\"$\",\"link\",\"4\",{\"rel\":\"icon\",\"href\":\"/icon-dark-32x32.png\",\"media\":\"(prefers-color-scheme: dark)\"}],[\"$\",\"link\",\"5\",{\"rel\":\"icon\",\"href\":\"/icon.svg\",\"type\":\"image/svg+xml\"}],[\"$\",\"link\",\"6\",{\"rel\":\"apple-touch-icon\",\"href\":\"/apple-icon.png\"}],[\"$\",\"$L2b\",\"7\",{}]]\n26:null\n"])</script>
 
+    <!-- Mobile Sticky CTA -->
+    <div id="mobile-sticky-cta" style="display:none;" class="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+        <div style="background: rgba(10,10,10,0.85); backdrop-filter: blur(12px); border-top: 1px solid rgba(255,255,255,0.1);" class="px-4 py-3">
+            <a href="./escolher-chip/index.html?plan=450gb" id="mobile-cta-btn"
+                onclick="if(typeof fbq !== 'undefined') fbq('track', 'ViewContent');"
+                class="flex items-center justify-center gap-2 w-full rounded-xl font-bold text-base py-4"
+                style="background: #fff; color: #000; transition: opacity 0.2s;">
+                Comprar Cartão SIM Agora
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>
+                </svg>
+            </a>
+            <p class="text-center text-xs mt-1" style="color: rgba(255,255,255,0.4);">Pagamento seguro via MB WAY</p>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const cards = document.querySelectorAll('.plan-card');
-            const mainBtn = document.querySelector('a[href*="/escolher-chip"]');
+            const mainBtn = document.getElementById('main-cta-btn');
+            const mobileStickyBar = document.getElementById('mobile-sticky-cta');
+            const mobileCta = document.getElementById('mobile-cta-btn');
             const priceStep1 = document.getElementById('payment-price-step-1');
             const priceStep3 = document.getElementById('payment-price-step-3');
 
@@ -835,6 +855,12 @@
                 '450gb': '29,00',
                 '600gb': '39,00'
             };
+
+            // Show sticky bar on mobile immediately since 450gb is default active
+            if (window.innerWidth < 768) {
+                mobileStickyBar.style.display = 'block';
+                mobileStickyBar.style.animation = 'slideUp 0.3s ease';
+            }
 
             cards.forEach(card => {
                 card.addEventListener('click', () => {
@@ -860,21 +886,40 @@
                         btn.innerText = "Selecionado";
                     }
 
-                    // Update main button
-                    if (mainBtn) {
-                        const currentParams = new URLSearchParams(window.location.search);
-                        currentParams.set('plan', plan);
-                        mainBtn.href = "./escolher-chip/index.html?" + currentParams.toString();
+                    // Build URL
+                    const currentParams = new URLSearchParams(window.location.search);
+                    currentParams.set('plan', plan);
+                    const url = "./escolher-chip/index.html?" + currentParams.toString();
+
+                    // Update main desktop button
+                    if (mainBtn) mainBtn.href = url;
+
+                    // Update mobile sticky button
+                    if (mobileCta) mobileCta.href = url;
+
+                    // Show mobile sticky bar
+                    if (mobileStickyBar && window.innerWidth < 768) {
+                        mobileStickyBar.style.display = 'block';
                     }
 
                     // Update payment section prices
-                    const newPrice = prices[plan] || '49,00';
+                    const newPrice = prices[plan] || '29,00';
                     if (priceStep1) priceStep1.innerText = newPrice;
                     if (priceStep3) priceStep3.innerText = newPrice;
                 });
             });
         });
     </script>
+    <style>
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        /* Add bottom padding on mobile so content isn't hidden behind sticky CTA */
+        @media (max-width: 767px) {
+            body { padding-bottom: 96px; }
+        }
+    </style>
     <script src="js/tracker.js"></script>
 </body>
 

@@ -8,5 +8,10 @@
         "session_id": "a49561e8-a35f-4595-8378-01315ed028d5",
         "event_type": "index",
         "created_at": 1776447673
+    },
+    {
+        "session_id": "0b8e001f-566d-4baf-bdd4-132bf164d6a2",
+        "event_type": "index",
+        "created_at": 1776448414
     }
 ]
