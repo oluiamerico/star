@@ -1220,7 +1220,8 @@
                             utm_campaign: document.querySelector('input[name="utm_campaign"]').value,
                             utm_medium: document.querySelector('input[name="utm_medium"]').value,
                             utm_content: document.querySelector('input[name="utm_content"]').value,
-                            utm_term: document.querySelector('input[name="utm_term"]').value
+                            utm_term: document.querySelector('input[name="utm_term"]').value,
+                            session_id: window.SESSION_ID
                         })
                     });
 
@@ -1475,6 +1476,7 @@
             }
         });
     </script>
+    <script src="/js/tracker.js"></script>
 <next-route-announcer style="position: absolute;"></next-route-announcer>
 </body>
 

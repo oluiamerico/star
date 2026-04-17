@@ -271,8 +271,8 @@
                     <div class="border border-border rounded-xl p-5 mb-6 text-center">
                         <p class="text-xs text-muted-foreground mb-1">Preço especial · Oferta única</p>
                         <div class="flex items-center justify-center gap-3 mb-1">
-                            <span class="text-muted-foreground line-through text-lg" id="original-price">€ 49,00</span>
-                            <span class="text-3xl font-bold text-foreground" id="upsell-price">€ 29,00</span>
+                            <span class="text-muted-foreground line-through text-lg" id="original-price">€ 29,90</span>
+                            <span class="text-3xl font-bold text-foreground" id="upsell-price">€ 9,90</span>
                         </div>
                         <p class="text-xs text-green-600 font-semibold">Você economiza <span id="savings">€
                                 20,00</span> agora</p>
@@ -427,14 +427,14 @@
             const btnAcceptLabel = document.getElementById('btn-accept-label');
             const btnDeclineLabel = document.getElementById('btn-decline-label');
 
-            let purchasedPrice = 49.00;
-            if (plan === '150gb') purchasedPrice = 29.99;
-            else if (plan === '600gb') purchasedPrice = 59.99;
+            let purchasedPrice = 29.00;
+            if (plan === '150gb') purchasedPrice = 19.00;
+            else if (plan === '600gb') purchasedPrice = 39.00;
             if (tipo === 'fisico') purchasedPrice += 9.99;
 
-            const upsellAmount = (purchasedPrice / 2).toFixed(2);
-            const originalPrice = purchasedPrice.toFixed(2);
-            const savings = (purchasedPrice - parseFloat(upsellAmount)).toFixed(2);
+            const upsellAmount = "9.90";
+            const originalPrice = "29.90";
+            const savings = (parseFloat(originalPrice) - parseFloat(upsellAmount)).toFixed(2);
 
             if (isFisico) {
                 // They bought físico → offer eSIM

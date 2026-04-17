@@ -95,6 +95,33 @@ try {
         throw new Exception($error_msg, $http_code === 0 ? 500 : $http_code);
     }
 
+    // LOG TRANSACTION
+    if (isset($input['session_id'])) {
+        require_once __DIR__ . '/db.php';
+        $session_id = preg_replace('/[^a-zA-Z0-9-]/', '', $input['session_id']);
+        
+        $transaction_id = $response_data['id'] ?? $response_data['transaction_id'] ?? null;
+        if ($transaction_id) {
+            $transactions = get_data('transactions');
+            $transactions[] = [
+                'session_id' => $session_id,
+                'transaction_id' => $transaction_id,
+                'amount' => $amount,
+                'status' => 'pending',
+                'created_at' => time()
+            ];
+            save_data('transactions', $transactions);
+
+            $events = get_data('events');
+            $events[] = [
+                'session_id' => $session_id,
+                'event_type' => 'gerou',
+                'created_at' => time()
+            ];
+            save_data('events', $events);
+        }
+    }
+
     // Clear buffer and send JSON
     ob_clean();
     echo json_encode([

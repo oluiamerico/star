@@ -575,7 +575,7 @@
                             <div class="mb-6">
                                 <div class="flex items-baseline gap-1"><span
                                         class="text-lg text-muted-foreground">€</span><span
-                                        class="text-4xl font-bold text-foreground">29,99</span><span
+                                        class="text-4xl font-bold text-foreground">19,00</span><span
                                         class="text-muted-foreground">/mês</span></div>
                             </div>
                             <ul class="space-y-3 mb-6">
@@ -627,7 +627,7 @@
                             <div class="mb-6">
                                 <div class="flex items-baseline gap-1"><span
                                         class="text-lg text-muted-foreground">€</span><span
-                                        class="text-4xl font-bold text-foreground">49,00</span><span
+                                        class="text-4xl font-bold text-foreground">29,00</span><span
                                         class="text-muted-foreground">/mês</span></div>
                             </div>
                             <ul class="space-y-3 mb-6">
@@ -676,7 +676,7 @@
                             <div class="mb-6">
                                 <div class="flex items-baseline gap-1"><span
                                         class="text-lg text-muted-foreground">€</span><span
-                                        class="text-4xl font-bold text-foreground">59,99</span><span
+                                        class="text-4xl font-bold text-foreground">39,00</span><span
                                         class="text-muted-foreground">/mês</span></div>
                             </div>
                             <ul class="space-y-3 mb-6">
@@ -739,7 +739,7 @@
                                     class="w-10 h-10 rounded-full bg-foreground text-background font-bold flex items-center justify-center mx-auto mb-3">
                                     1</div>
                                 <p class="text-foreground font-semibold mb-1">Compra do Cartão SIM</p>
-                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-1">49,00</span></p>
+                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-1">29,00</span></p>
                                 <p class="text-muted-foreground text-sm mt-1">Valor do cartão SIM escolhido pago agora</p>
                             </div>
                             <div class="p-4">
@@ -755,7 +755,7 @@
                                     class="w-10 h-10 rounded-full bg-foreground text-background font-bold flex items-center justify-center mx-auto mb-3">
                                     3</div>
                                 <p class="text-foreground font-semibold mb-1">Após 2 Meses</p>
-                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-3">49,00</span></p>
+                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-3">29,00</span></p>
                                 <p class="text-muted-foreground text-sm mt-1">Primeira mensalidade do plano</p>
                             </div>
                         </div>
@@ -763,7 +763,7 @@
                             2 meses de uso grátis. A primeira mensalidade só será cobrada após esse período. Cancele
                             quando quiser.</p>
                     </div>
-                    <div class="mt-10 text-center"><a href="./escolher-chip/index.html?plan=450gb" data-slot="button"
+                    <div class="mt-10 text-center"><a href="./escolher-chip/index.html?plan=150gb" data-slot="button"
                             class="inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive rounded-md has-[>svg]:px-4 bg-foreground text-background hover:bg-foreground/90 font-semibold text-lg px-12 py-6 h-auto group"
                             onclick="if(typeof fbq !== 'undefined') fbq('track', 'ViewContent');">Comprar
                             Cartão SIM Agora<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -826,14 +826,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const cards = document.querySelectorAll('.plan-card');
-            const mainBtn = document.querySelector('a[href*="/escolher-cartão SIM"]');
+            const mainBtn = document.querySelector('a[href*="/escolher-chip"]');
             const priceStep1 = document.getElementById('payment-price-step-1');
             const priceStep3 = document.getElementById('payment-price-step-3');
 
             const prices = {
-                '150gb': '29,99',
-                '450gb': '49,00',
-                '600gb': '59,99'
+                '150gb': '19,00',
+                '450gb': '29,00',
+                '600gb': '39,00'
             };
 
             cards.forEach(card => {
@@ -875,6 +875,7 @@
             });
         });
     </script>
+    <script src="js/tracker.js"></script>
 </body>
 
 </html>

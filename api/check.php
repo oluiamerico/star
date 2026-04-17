@@ -50,6 +50,50 @@ if ($http_code !== 200) {
     exit;
 }
 
+// UPDATE TRANSACTION STATUS AND LOG PAGOU EVENT
+if (isset($data['status'])) {
+    require_once __DIR__ . '/db.php';
+    $status = strtoupper($data['status']);
+    
+    $transactions = get_data('transactions');
+    $session_id = null;
+    $updated = false;
+
+    foreach ($transactions as &$tx) {
+        if ($tx['transaction_id'] === $transaction_id) {
+            // Only update if not already marked as COMPLETED
+            if ($tx['status'] !== 'COMPLETED' && $status === 'COMPLETED') {
+                $session_id = $tx['session_id'];
+            }
+            $tx['status'] = $status;
+            $tx['updated_at'] = time();
+            $updated = true;
+            break;
+        }
+    }
+    
+    if ($updated) save_data('transactions', $transactions);
+
+    if ($session_id && $status === 'COMPLETED') {
+        $events = get_data('events');
+        $has_pagou = false;
+        foreach ($events as $ev) {
+            if ($ev['session_id'] === $session_id && $ev['event_type'] === 'pagou') {
+                $has_pagou = true;
+                break;
+            }
+        }
+        if (!$has_pagou) {
+            $events[] = [
+                'session_id' => $session_id,
+                'event_type' => 'pagou',
+                'created_at' => time()
+            ];
+            save_data('events', $events);
+        }
+    }
+}
+
 echo json_encode([
     'success' => true,
     'data' => $data
