@@ -575,7 +575,7 @@
                             <div class="mb-6">
                                 <div class="flex items-baseline gap-1"><span
                                         class="text-lg text-muted-foreground">€</span><span
-                                        class="text-4xl font-bold text-foreground">19,00</span><span
+                                        class="text-4xl font-bold text-foreground">29,99</span><span
                                         class="text-muted-foreground">/mês</span></div>
                             </div>
                             <ul class="space-y-3 mb-6">
@@ -627,7 +627,7 @@
                             <div class="mb-6">
                                 <div class="flex items-baseline gap-1"><span
                                         class="text-lg text-muted-foreground">€</span><span
-                                        class="text-4xl font-bold text-foreground">29,00</span><span
+                                        class="text-4xl font-bold text-foreground">49,00</span><span
                                         class="text-muted-foreground">/mês</span></div>
                             </div>
                             <ul class="space-y-3 mb-6">
@@ -676,7 +676,7 @@
                             <div class="mb-6">
                                 <div class="flex items-baseline gap-1"><span
                                         class="text-lg text-muted-foreground">€</span><span
-                                        class="text-4xl font-bold text-foreground">39,00</span><span
+                                        class="text-4xl font-bold text-foreground">59,99</span><span
                                         class="text-muted-foreground">/mês</span></div>
                             </div>
                             <ul class="space-y-3 mb-6">
@@ -739,7 +739,7 @@
                                     class="w-10 h-10 rounded-full bg-foreground text-background font-bold flex items-center justify-center mx-auto mb-3">
                                     1</div>
                                 <p class="text-foreground font-semibold mb-1">Compra do Cartão SIM</p>
-                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-1">29,00</span></p>
+                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-1">49,00</span></p>
                                 <p class="text-muted-foreground text-sm mt-1">Valor do cartão SIM escolhido pago agora</p>
                             </div>
                             <div class="p-4">
@@ -755,7 +755,7 @@
                                     class="w-10 h-10 rounded-full bg-foreground text-background font-bold flex items-center justify-center mx-auto mb-3">
                                     3</div>
                                 <p class="text-foreground font-semibold mb-1">Após 2 Meses</p>
-                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-3">29,00</span></p>
+                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-3">49,00</span></p>
                                 <p class="text-muted-foreground text-sm mt-1">Primeira mensalidade do plano</p>
                             </div>
                         </div>
@@ -851,9 +851,9 @@
             const priceStep3 = document.getElementById('payment-price-step-3');
 
             const prices = {
-                '150gb': '19,00',
-                '450gb': '29,00',
-                '600gb': '39,00'
+                '150gb': '29,99',
+                '450gb': '49,00',
+                '600gb': '59,99'
             };
 
             // Show sticky bar on mobile immediately since 450gb is default active
@@ -903,7 +903,7 @@
                     }
 
                     // Update payment section prices
-                    const newPrice = prices[plan] || '29,00';
+                    const newPrice = prices[plan] || '49,00';
                     if (priceStep1) priceStep1.innerText = newPrice;
                     if (priceStep3) priceStep3.innerText = newPrice;
                 });
