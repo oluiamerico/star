@@ -771,7 +771,7 @@
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between text-sm"><span class="text-muted-foreground">Compra do Cartão SIM
                                     (<span id="plan-gb-text">450 GB</span>)</span><span class="text-foreground">€ <span
-                                        id="plan-price-text1">49,00</span></span></div>
+                                        id="plan-price-text1">29,90</span></span></div>
                             <div class="flex justify-between text-sm" id="shipping-row"><span
                                     class="text-muted-foreground">Taxa de
                                     envio</span><span id="shipping-value"
@@ -806,7 +806,7 @@
                         <div class="flex justify-between items-baseline mb-6"><span
                                 class="text-foreground font-medium">Total hoje:</span>
                             <div class="text-right"><span class="text-2xl font-bold text-foreground">€ <span
-                                        id="plan-price-text2">49,00</span></span>
+                                        id="plan-price-text2">29,90</span></span>
                             </div>
                         </div>
 
@@ -849,9 +849,9 @@
             const isFisico = tipo === 'fisico';
             
             function calculateTotalCents() {
-                let baseAmount = 4900; // 450gb original
-                if (plan === '150gb') baseAmount = 2999;
-                else if (plan === '600gb') baseAmount = 5999;
+                let baseAmount = 2990; // 450gb original
+                if (plan === '150gb') baseAmount = 1990;
+                else if (plan === '600gb') baseAmount = 3990;
 
                 let shipping = isFisico ? 999 : 0;
                 let totalCents = baseAmount + shipping;
@@ -876,7 +876,7 @@
 
             const totalCents = calculateTotalCents();
             const totalAmountText = formatCurrency(totalCents);
-            const baseAmountCents = (plan === '150gb') ? 2999 : (plan === '600gb' ? 5999 : 4900);
+            const baseAmountCents = (plan === '150gb') ? 1990 : (plan === '600gb' ? 3990 : 2990);
             const amountText = formatCurrency(baseAmountCents);
 
             const elementsToUpdate = {
