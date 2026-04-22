@@ -23,5 +23,10 @@
         "session_id": "35a0cda4-83b0-4c53-a197-1adf45e87789",
         "event_type": "index",
         "created_at": 1776715562
+    },
+    {
+        "session_id": "299f18fe-3795-4d91-ac99-a4a5040dd40d",
+        "event_type": "index",
+        "created_at": 1776877816
     }
 ]

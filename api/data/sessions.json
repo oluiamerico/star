@@ -13,7 +13,7 @@
         "location": "Unknown",
         "current_page": "index",
         "created_at": 1776447364,
-        "last_ping": 1776877515
+        "last_ping": 1776877828
     },
     {
         "session_id": "a49561e8-a35f-4595-8378-01315ed028d5",
@@ -46,5 +46,13 @@
         "current_page": "index",
         "created_at": 1776715562,
         "last_ping": 1776715562
+    },
+    {
+        "session_id": "299f18fe-3795-4d91-ac99-a4a5040dd40d",
+        "ip": "127.0.0.1",
+        "location": "Localhost",
+        "current_page": "index",
+        "created_at": 1776877816,
+        "last_ping": 1776877816
     }
 ]

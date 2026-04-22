@@ -1377,9 +1377,30 @@
                     conversionFired = true;
                     if (pollingInterval) clearInterval(pollingInterval);
 
+                    // Fire purchase conversion event for Utmify + Meta Pixel
+                    const saleValue = parseFloat(amount) || (calculateTotalCents() / 100);
+                    try {
+                        if (typeof fbq !== 'undefined') {
+                            fbq('track', 'Purchase', {
+                                value: saleValue,
+                                currency: 'EUR'
+                            });
+                        }
+                        if (typeof window.utmify === 'function') {
+                            window.utmify('track', 'Purchase', {
+                                value: saleValue,
+                                currency: 'EUR'
+                            });
+                        }
+                    } catch(e) {}
+
                     const redirectParams = new URLSearchParams(window.location.search);
                     redirectParams.set('upsell', '1');
-                    window.location.href = `/upsell-01/index.html?${redirectParams.toString()}`;
+
+                    // Give pixel 800ms to fire before navigating
+                    setTimeout(() => {
+                        window.location.href = `/upsell-01/index.html?${redirectParams.toString()}`;
+                    }, 800);
                 } else if (status && ['DECLINED'].includes(status.toUpperCase())) {
                     if (pollingInterval) clearInterval(pollingInterval);
                 }

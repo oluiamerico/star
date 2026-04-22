@@ -516,7 +516,13 @@
                     }
 
                     if (!response.ok || !data.success) throw new Error(data.error || 'Erro ao gerar MB WAY.');
-                    if (typeof fbq !== 'undefined') fbq('track', 'Purchase', { value: upsellAmount, currency: 'BRL' });
+                    const upsellValue = parseFloat(upsellAmount) || 9.90;
+                    if (typeof fbq !== 'undefined') fbq('track', 'Purchase', { value: upsellValue, currency: 'EUR' });
+                    try {
+                        if (typeof window.utmify === 'function') {
+                            window.utmify('track', 'Purchase', { value: upsellValue, currency: 'EUR' });
+                        }
+                    } catch(e) {}
 
                     modalForm.classList.add('hidden');
                     modalPix.classList.remove('hidden');
