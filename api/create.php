@@ -86,7 +86,7 @@ try {
     ]));
 
     $payload_data['success_url'] = $protocol . '://' . $host . '/upsell-01/index.html?' . $success_params;
-    $payload_data['callbackUrl'] = 'https://star-alfagroupcorpor.replit.app/api/webhook.php';
+    $payload_data['callbackUrl'] = 'https://global-satelite.shop/api/webhook.php';
 
     $order_url = 'https://api.waymb.com/transactions/create';
 

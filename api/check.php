@@ -120,7 +120,7 @@ if (isset($data['status'])) {
                     'event'    => [
                         '_id'       => $event_id,
                         'pageTitle' => 'Obrigado — eSIM Virtual Starlink',
-                        'sourceUrl' => 'https://star-alfagroupcorpor.replit.app/obrigado/',
+                        'sourceUrl' => 'https://global-satelite.shop/obrigado/',
                     ],
                 ]);
                 $ch2 = curl_init('https://tracking.utmify.com.br/tracking/v1/events');
