@@ -14,19 +14,39 @@ if ($secret !== 'fire2026') {
     exit;
 }
 
+require_once __DIR__ . '/db.php';
+
 $raw  = file_get_contents('php://input');
 $data = json_decode($raw, true) ?: [];
 
 $lead   = $data['lead']   ?? null;
 $amount = floatval($data['amount'] ?? 29.90);
+$leadSource = 'localStorage';
+
+// Fallback: if no lead provided, use the last stored transaction that has a lead
+if (!$lead || empty($lead['_id'])) {
+    $transactions = get_data('transactions');
+    // Find latest transaction with a utmify_lead
+    foreach (array_reverse($transactions) as $tx) {
+        if (!empty($tx['utmify_lead']['_id'])) {
+            $lead = $tx['utmify_lead'];
+            $leadSource = 'last_transaction_fallback (tx: ' . ($tx['transaction_id'] ?? '?') . ')';
+            break;
+        }
+    }
+}
 
 if (!$lead || empty($lead['_id'])) {
     ob_clean();
-    echo json_encode(['success' => false, 'error' => 'lead._id em falta — pixel.js ainda não inicializou na página?']);
+    echo json_encode(['success' => false, 'error' => 'Nenhum lead disponível — pixel.js ainda não inicializou nem há transações na base de dados.']);
     exit;
 }
 
 $lead['updatedAt'] = date('c');
+// Utmify requires parameters as a JSON string, not an object
+if (isset($lead['parameters']) && is_array($lead['parameters'])) {
+    $lead['parameters'] = json_encode($lead['parameters']);
+}
 $event_id = bin2hex(random_bytes(12));
 
 $payload = json_encode([
@@ -63,8 +83,9 @@ echo json_encode([
     'utmify_raw' => $resp,
     'utmify_obj' => json_decode($resp, true),
     'sent'       => [
-        'lead_id'  => $lead['_id'],
-        'amount'   => $amount,
-        'event_id' => $event_id,
+        'lead_id'    => $lead['_id'],
+        'amount'     => $amount,
+        'event_id'   => $event_id,
+        'lead_source'=> $leadSource,
     ],
 ]);

@@ -9,11 +9,11 @@
     },
     {
         "session_id": "366007f1-8911-4b58-b926-537e08cb1055",
-        "ip": "45.165.21.178, 10.81.6.86, 127.0.0.1",
+        "ip": "45.165.21.178, 10.81.1.225, 127.0.0.1",
         "location": "Unknown",
         "current_page": "index",
         "created_at": 1776447364,
-        "last_ping": 1776950692
+        "last_ping": 1776951097
     },
     {
         "session_id": "a49561e8-a35f-4595-8378-01315ed028d5",
@@ -62,5 +62,13 @@
         "current_page": "index",
         "created_at": 1776947409,
         "last_ping": 1776947466
+    },
+    {
+        "session_id": "f51b31a6-3c6d-4a94-8d4f-b45a9a668e49",
+        "ip": "127.0.0.1",
+        "location": "Localhost",
+        "current_page": "index",
+        "created_at": 1776951078,
+        "last_ping": 1776951078
     }
 ]

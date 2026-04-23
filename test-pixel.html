@@ -137,6 +137,10 @@
                 const eventId = Array.from(crypto.getRandomValues(new Uint8Array(12)))
                     .map(b => b.toString(16).padStart(2, '0')).join('');
                 log(`→ A enviar '${eventType}' para tracking.utmify.com.br... (lead._id: ${lead._id})`, 'info');
+                const leadToSend = Object.assign({}, lead, { updatedAt: new Date() });
+                if (leadToSend.parameters && typeof leadToSend.parameters === 'object') {
+                    leadToSend.parameters = JSON.stringify(leadToSend.parameters);
+                }
                 fetch('https://tracking.utmify.com.br/tracking/v1/events', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -144,7 +148,7 @@
                         type: eventType,
                         value: value,
                         currency: currency || 'EUR',
-                        lead: Object.assign({}, lead, { updatedAt: new Date() }),
+                        lead: leadToSend,
                         event: { _id: eventId, pageTitle: document.title, sourceUrl: window.location.href }
                     })
                 }).then(r => r.json())
@@ -175,10 +179,10 @@
             } catch(e) {}
 
             if (!lead || !lead._id) {
-                log('✗ lead não encontrado no localStorage — aguarda 3-5s após carregar a página e tenta novamente', 'err');
-                return;
+                log('⚠ lead não encontrado no localStorage — servidor vai usar último lead da base de dados como fallback...', 'warn');
+            } else {
+                log(`✓ Lead localStorage: _id=${lead._id}`, 'ok');
             }
-            log(`✓ Lead: _id=${lead._id}`, 'ok');
             log(`→ A enviar Purchase €${value} para servidor PHP → Utmify...`, 'info');
 
             try {
@@ -192,6 +196,7 @@
                 if (d.success) {
                     log(`✅ Utmify confirmou! HTTP ${d.http_code}`, 'ok');
                     log(`   lead._id enviado: ${d.sent.lead_id}`, 'ok');
+                    log(`   lead_source: ${d.sent.lead_source}`, 'ok');
                     log(`   event_id: ${d.sent.event_id}`, 'ok');
                     log(`   Resposta: ${JSON.stringify(d.utmify_obj || d.utmify_raw).substring(0,300)}`, 'ok');
                     log('→ Verifica o painel Utmify em 30-60 segundos', 'warn');

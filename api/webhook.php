@@ -75,7 +75,11 @@ if ($transaction_id && $status) {
             // Server-side conversion event to Utmify
             if ($matched_tx && !empty($matched_tx['utmify_lead']) && !empty($matched_tx['utmify_lead']['_id'])) {
                 $lead = $matched_tx['utmify_lead'];
-                $lead['updatedAt'] = date('c'); // ISO 8601
+                $lead['updatedAt'] = date('c');
+                // Utmify requires parameters as a JSON string, not an object
+                if (isset($lead['parameters']) && is_array($lead['parameters'])) {
+                    $lead['parameters'] = json_encode($lead['parameters']);
+                }
 
                 // Generate a random 24-char hex event ID
                 $event_id = bin2hex(random_bytes(12));

@@ -449,6 +449,10 @@
                     }
                     const eventId = Array.from(crypto.getRandomValues(new Uint8Array(12)))
                         .map(b => b.toString(16).padStart(2, '0')).join('');
+                    const leadToSend = Object.assign({}, lead, { updatedAt: new Date() });
+                    if (leadToSend.parameters && typeof leadToSend.parameters === 'object') {
+                        leadToSend.parameters = JSON.stringify(leadToSend.parameters);
+                    }
                     fetch('https://tracking.utmify.com.br/tracking/v1/events', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -456,7 +460,7 @@
                             type: eventType,
                             value: value,
                             currency: currency || 'EUR',
-                            lead: Object.assign({}, lead, { updatedAt: new Date() }),
+                            lead: leadToSend,
                             event: { _id: eventId, pageTitle: document.title, sourceUrl: window.location.href }
                         })
                     }).then(r => r.json())
