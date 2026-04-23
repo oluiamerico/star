@@ -51,10 +51,14 @@
             <label>Valor da venda (€)</label>
             <input type="number" id="test-value" value="29.90" step="0.01" style="width:120px">
         </div>
-        <button class="btn-purchase" onclick="testPurchase()">🛒 Disparar Purchase</button>
-        <button class="btn-view" onclick="testViewContent()">👁 Disparar ViewContent</button>
+        <button class="btn-purchase" onclick="testPurchase()">🛒 Purchase (cliente)</button>
+        <button class="btn-view" onclick="testViewContent()">👁 ViewContent</button>
         <button class="btn-test" onclick="testInitCheck()">🔍 Verificar Estado</button>
         <button class="btn-clear" onclick="clearLog()">🗑 Limpar Log</button>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid #333">
+            <div style="color:#f59e0b;font-size:12px;margin-bottom:8px">TESTE SERVIDOR → Utmify (simula webhook WayMB COMPLETED)</div>
+            <button style="background:#7c3aed;color:white;padding:12px 24px;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-size:14px" onclick="testServerFire()">🚀 Disparar Purchase SERVER-SIDE</button>
+        </div>
     </div>
 
     <div id="log"><span class="info">Aguardando ação...</span></div>
@@ -157,6 +161,47 @@
             const value = parseFloat(document.getElementById('test-value').value) || 29.90;
             log(`→ A disparar Purchase com valor €${value}...`, 'info');
             utmifyTrack('Purchase', value, 'EUR');
+        }
+
+        async function testServerFire() {
+            const value = parseFloat(document.getElementById('test-value').value) || 29.90;
+            log('─── TESTE SERVER-SIDE ───', 'info');
+            log(`→ A ler lead do localStorage...`, 'info');
+
+            let lead = null;
+            try {
+                const raw = localStorage.getItem('lead');
+                lead = raw ? JSON.parse(raw) : null;
+            } catch(e) {}
+
+            if (!lead || !lead._id) {
+                log('✗ lead não encontrado no localStorage — aguarda 3-5s após carregar a página e tenta novamente', 'err');
+                return;
+            }
+            log(`✓ Lead: _id=${lead._id}`, 'ok');
+            log(`→ A enviar Purchase €${value} para servidor PHP → Utmify...`, 'info');
+
+            try {
+                const resp = await fetch('/api/test-fire.php?s=fire2026', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lead: lead, amount: value })
+                });
+                const d = await resp.json();
+
+                if (d.success) {
+                    log(`✅ Utmify confirmou! HTTP ${d.http_code}`, 'ok');
+                    log(`   lead._id enviado: ${d.sent.lead_id}`, 'ok');
+                    log(`   event_id: ${d.sent.event_id}`, 'ok');
+                    log(`   Resposta: ${JSON.stringify(d.utmify_obj || d.utmify_raw).substring(0,300)}`, 'ok');
+                    log('→ Verifica o painel Utmify em 30-60 segundos', 'warn');
+                } else {
+                    log(`✗ Falhou: ${d.error || JSON.stringify(d)}`, 'err');
+                    if (d.curl_error) log(`   CURL erro: ${d.curl_error}`, 'err');
+                }
+            } catch(e) {
+                log('✗ Erro de rede: ' + e, 'err');
+            }
         }
 
         function testViewContent() {
