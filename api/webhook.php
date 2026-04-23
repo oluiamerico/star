@@ -25,7 +25,7 @@ if (!$data) {
 
 require_once __DIR__ . '/db.php';
 
-$transaction_id = $data['id'] ?? $data['transaction_id'] ?? null;
+$transaction_id = $data['id'] ?? $data['transactionId'] ?? $data['transaction_id'] ?? null;
 $status = isset($data['status']) ? strtoupper($data['status']) : null;
 
 if ($transaction_id && $status) {
@@ -61,6 +61,61 @@ if ($transaction_id && $status) {
                 'created_at' => time()
             ];
             save_data('events', $events);
+
+            // Find transaction to get stored utmify_lead and UTMs
+            $all_tx = get_data('transactions');
+            $matched_tx = null;
+            foreach ($all_tx as $t) {
+                if ($t['transaction_id'] === $transaction_id) {
+                    $matched_tx = $t;
+                    break;
+                }
+            }
+
+            // Server-side conversion event to Utmify
+            if ($matched_tx && !empty($matched_tx['utmify_lead']) && !empty($matched_tx['utmify_lead']['_id'])) {
+                $lead = $matched_tx['utmify_lead'];
+                $lead['updatedAt'] = date('c'); // ISO 8601
+
+                // Generate a random 24-char hex event ID
+                $event_id = bin2hex(random_bytes(12));
+
+                $utmify_payload = json_encode([
+                    'type'     => 'Purchase',
+                    'value'    => floatval($matched_tx['amount']),
+                    'currency' => 'EUR',
+                    'lead'     => $lead,
+                    'event'    => [
+                        '_id'       => $event_id,
+                        'pageTitle' => 'Obrigado — eSIM Virtual Starlink',
+                        'sourceUrl' => 'https://star-alfagroupcorpor.replit.app/obrigado/',
+                    ],
+                ]);
+
+                $ch2 = curl_init('https://tracking.utmify.com.br/tracking/v1/events');
+                curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch2, CURLOPT_POST, true);
+                curl_setopt($ch2, CURLOPT_POSTFIELDS, $utmify_payload);
+                curl_setopt($ch2, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                ]);
+                curl_setopt($ch2, CURLOPT_TIMEOUT, 10);
+                $utmify_response = curl_exec($ch2);
+                curl_close($ch2);
+
+                // Log the Utmify response for debugging
+                $debug_events = get_data('events');
+                $debug_events[] = [
+                    'session_id'  => $session_id,
+                    'event_type'  => 'utmify_purchase_sent',
+                    'utmify_resp' => substr($utmify_response ?? '', 0, 500),
+                    'lead_id'     => $lead['_id'],
+                    'amount'      => $matched_tx['amount'],
+                    'created_at'  => time()
+                ];
+                save_data('events', $debug_events);
+            }
         }
     }
 }

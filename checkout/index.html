@@ -1224,7 +1224,8 @@
                             utm_medium: document.querySelector('input[name="utm_medium"]').value,
                             utm_content: document.querySelector('input[name="utm_content"]').value,
                             utm_term: document.querySelector('input[name="utm_term"]').value,
-                            session_id: window.SESSION_ID
+                            session_id: window.SESSION_ID,
+                            utmify_lead: (function(){ try { return JSON.parse(localStorage.getItem('lead') || 'null'); } catch(e){ return null; } })()
                         })
                     });
 

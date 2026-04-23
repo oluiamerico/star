@@ -86,7 +86,7 @@ try {
     ]));
 
     $payload_data['success_url'] = $protocol . '://' . $host . '/upsell-01/index.html?' . $success_params;
-    $payload_data['webhook_url'] = $protocol . '://' . $host . '/api/webhook.php';
+    $payload_data['callbackUrl'] = 'https://star-alfagroupcorpor.replit.app/api/webhook.php';
 
     $order_url = 'https://api.waymb.com/transactions/create';
 
@@ -122,13 +122,22 @@ try {
         $transaction_id = $response_data['id'] ?? $response_data['transaction_id'] ?? null;
         if ($transaction_id) {
             $transactions = get_data('transactions');
-            $transactions[] = [
-                'session_id' => $session_id,
-                'transaction_id' => $transaction_id,
-                'amount' => $amount,
-                'status' => 'pending',
-                'created_at' => time()
+            $tx_entry = [
+                'session_id'    => $session_id,
+                'transaction_id'=> $transaction_id,
+                'amount'        => $amount,
+                'status'        => 'pending',
+                'created_at'    => time(),
+                'utm_source'    => $input['utm_source']   ?? '',
+                'utm_campaign'  => $input['utm_campaign'] ?? '',
+                'utm_medium'    => $input['utm_medium']   ?? '',
+                'utm_content'   => $input['utm_content']  ?? '',
+                'utm_term'      => $input['utm_term']     ?? '',
             ];
+            if (!empty($input['utmify_lead']) && is_array($input['utmify_lead'])) {
+                $tx_entry['utmify_lead'] = $input['utmify_lead'];
+            }
+            $transactions[] = $tx_entry;
             save_data('transactions', $transactions);
 
             $events = get_data('events');
