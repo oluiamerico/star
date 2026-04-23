@@ -38,5 +38,56 @@
         "session_id": "f51b31a6-3c6d-4a94-8d4f-b45a9a668e49",
         "event_type": "index",
         "created_at": 1776951078
+    },
+    {
+        "session_id": "047f2285-8234-4434-bcd9-5222aaae2bbb",
+        "event_type": "index",
+        "created_at": 1776952820
+    },
+    {
+        "session_id": "1d6ac64d-005e-455e-8457-d2df30102c2f",
+        "event_type": "index",
+        "created_at": 1776958786
+    },
+    {
+        "session_id": "d9e2d44a-483c-4e5c-8e91-ae5a9c62a123",
+        "event_type": "index",
+        "created_at": 1776963152
+    },
+    {
+        "session_id": "test-debug-123",
+        "event_type": "gerou",
+        "created_at": 1776963233
+    },
+    {
+        "session_id": "test-debug-123",
+        "event_type": "pagou",
+        "created_at": 1776963285
+    },
+    {
+        "session_id": "test-debug-123",
+        "event_type": "utmify_purchase_sent",
+        "utmify_resp": "{\"lead\":{\"_id\":\"69ea1307ab505ec789cc75ab\",\"ip\":\"45.165.21.178\",\"metaPixelIds\":[\"740451731111426\"],\"tikTokPixelIds\":[],\"pixelId\":\"69b5d2cef247cc4b40527718\",\"fbp\":\"fb.2.1776444467651.66481013328062779\"},\"event\":{\"_id\":\"69ea4ed5afbda97b3003bc25\",\"pixelId\":\"69b5d2cef247cc4b40527718\",\"leadId\":\"69ea1307ab505ec789cc75ab\",\"createdAt\":\"2026-04-23T16:54:45.392Z\",\"eventTime\":\"2026-04-23T16:54:45.392Z\",\"type\":\"Purchase\",\"pixelType\":\"Meta\",\"sourceUrl\":\"https:\/\/star-alfagroupcorpor.replit.app\/obrigado\/\",\"page",
+        "lead_id": "69ea1307ab505ec789cc75ab",
+        "amount": 29.9,
+        "created_at": 1776963285
+    },
+    {
+        "session_id": "sess-test-999",
+        "event_type": "gerou",
+        "created_at": 1776963392
+    },
+    {
+        "session_id": "sess-test-999",
+        "event_type": "pagou",
+        "created_at": 1776963393
+    },
+    {
+        "session_id": "sess-test-999",
+        "event_type": "utmify_purchase_sent",
+        "utmify_resp": "{\"lead\":{\"_id\":\"69ea1307ab505ec789cc75ab\",\"ip\":\"45.165.21.178\",\"metaPixelIds\":[\"740451731111426\"],\"tikTokPixelIds\":[],\"pixelId\":\"69b5d2cef247cc4b40527718\",\"fbp\":\"fb.2.1776444467651.66481013328062779\"},\"event\":{\"_id\":\"69ea4f41afbda97b3003e058\",\"pixelId\":\"69b5d2cef247cc4b40527718\",\"leadId\":\"69ea1307ab505ec789cc75ab\",\"createdAt\":\"2026-04-23T16:56:33.289Z\",\"eventTime\":\"2026-04-23T16:56:33.289Z\",\"type\":\"Purchase\",\"pixelType\":\"Meta\",\"sourceUrl\":\"https:\/\/star-alfagroupcorpor.replit.app\/obrigado\/\",\"page",
+        "lead_id": "69ea1307ab505ec789cc75ab",
+        "amount": 29.9,
+        "created_at": 1776963393
     }
 ]

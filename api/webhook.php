@@ -25,7 +25,14 @@ if (!$data) {
 
 require_once __DIR__ . '/db.php';
 
-$transaction_id = $data['id'] ?? $data['transactionId'] ?? $data['transaction_id'] ?? null;
+$transaction_id = $data['id'] ?? $data['transactionId'] ?? $data['transactionID'] ?? $data['transaction_id'] ?? null;
+
+// Log raw webhook payload for debugging
+$debug_log = get_data('webhook_logs');
+$debug_log[] = ['received_at' => time(), 'payload' => $data, 'transaction_id' => $transaction_id];
+if (count($debug_log) > 50) $debug_log = array_slice($debug_log, -50);
+save_data('webhook_logs', $debug_log);
+
 $status = isset($data['status']) ? strtoupper($data['status']) : null;
 
 if ($transaction_id && $status) {
