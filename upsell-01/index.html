@@ -433,15 +433,44 @@
                 if (tipo === 'fisico') purchasedPrice += 9.99;
             }
 
+            // Send event directly to Utmify's tracking API (bypasses fbq, goes to their attribution engine)
+            function utmifyTrack(eventType, value, currency) {
+                // Step 1: Meta pixel via fbq (for Meta Ads reporting)
+                if (typeof fbq !== 'undefined') {
+                    try { fbq('track', eventType, { value: value, currency: currency || 'EUR' }); } catch(e) {}
+                }
+                // Step 2: Direct POST to Utmify's /events endpoint (for their dashboard + campaign attribution)
+                try {
+                    const leadRaw = localStorage.getItem('lead');
+                    const lead = leadRaw ? JSON.parse(leadRaw) : null;
+                    if (!lead || !lead._id) {
+                        console.log('[Utmify] Lead não encontrado no localStorage — pixel ainda não inicializou?');
+                        return;
+                    }
+                    const eventId = Array.from(crypto.getRandomValues(new Uint8Array(12)))
+                        .map(b => b.toString(16).padStart(2, '0')).join('');
+                    fetch('https://tracking.utmify.com.br/tracking/v1/events', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: eventType,
+                            value: value,
+                            currency: currency || 'EUR',
+                            lead: Object.assign({}, lead, { updatedAt: new Date() }),
+                            event: { _id: eventId, pageTitle: document.title, sourceUrl: window.location.href }
+                        })
+                    }).then(r => r.json())
+                      .then(d => console.log('[Utmify] Evento enviado:', eventType, '— lead._id:', lead._id, '— resp:', JSON.stringify(d).substring(0, 120)))
+                      .catch(e => console.log('[Utmify] Erro ao enviar evento:', e));
+                } catch(e) {
+                    console.log('[Utmify] Erro:', e);
+                }
+            }
+
             // Fire main purchase conversion here — page is stable, pixel is fully loaded
             function fireMainPurchase() {
                 try {
-                    if (typeof fbq !== 'undefined') {
-                        fbq('track', 'Purchase', { value: purchasedPrice, currency: 'EUR' });
-                    }
-                    if (typeof window.utmify === 'function') {
-                        window.utmify('track', 'Purchase', { value: purchasedPrice, currency: 'EUR' });
-                    }
+                    utmifyTrack('Purchase', purchasedPrice, 'EUR');
                     console.log('[Tracking] Purchase fired — value:', purchasedPrice, 'EUR');
                 } catch(e) {
                     console.error('[Tracking] Purchase error:', e);
@@ -540,12 +569,7 @@
 
                     if (!response.ok || !data.success) throw new Error(data.error || 'Erro ao gerar MB WAY.');
                     const upsellValue = parseFloat(upsellAmount) || 9.90;
-                    if (typeof fbq !== 'undefined') fbq('track', 'Purchase', { value: upsellValue, currency: 'EUR' });
-                    try {
-                        if (typeof window.utmify === 'function') {
-                            window.utmify('track', 'Purchase', { value: upsellValue, currency: 'EUR' });
-                        }
-                    } catch(e) {}
+                    utmifyTrack('Purchase', upsellValue, 'EUR');
 
                     modalForm.classList.add('hidden');
                     modalPix.classList.remove('hidden');

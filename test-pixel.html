@@ -41,6 +41,7 @@
             <div class="status-item" id="status-fbq" style="background:#333">fbq: verificando...</div>
             <div class="status-item" id="status-utmify" style="background:#333">utmify: verificando...</div>
             <div class="status-item" id="status-pixelid" style="background:#333">pixelId: verificando...</div>
+            <div class="status-item" id="status-lead" style="background:#333">lead localStorage: verificando...</div>
         </div>
     </div>
 
@@ -72,6 +73,7 @@
             const fbqEl = document.getElementById('status-fbq');
             const utmEl = document.getElementById('status-utmify');
             const pidEl = document.getElementById('status-pixelid');
+            const leadEl = document.getElementById('status-lead');
 
             if (typeof fbq !== 'undefined') {
                 fbqEl.textContent = 'fbq: ✓ disponível';
@@ -85,42 +87,76 @@
                 utmEl.textContent = 'window.utmify: ✓ disponível';
                 utmEl.style.background = '#166534';
             } else {
-                utmEl.textContent = 'window.utmify: ✗ não encontrado';
-                utmEl.style.background = '#7f1d1d';
+                utmEl.textContent = 'window.utmify: ✗ normal (usa fbq)';
+                utmEl.style.background = '#374151';
             }
 
             pidEl.textContent = 'pixelId: ' + (window.pixelId || 'não definido');
             pidEl.style.background = window.pixelId ? '#1e3a5f' : '#7f1d1d';
+
+            try {
+                const leadRaw = localStorage.getItem('lead');
+                const lead = leadRaw ? JSON.parse(leadRaw) : null;
+                if (lead && lead._id) {
+                    leadEl.textContent = 'lead: ✓ _id=' + lead._id.substring(0, 8) + '...';
+                    leadEl.style.background = '#166534';
+                } else {
+                    leadEl.textContent = 'lead: ✗ não encontrado';
+                    leadEl.style.background = '#7f1d1d';
+                }
+            } catch(e) {
+                leadEl.textContent = 'lead: erro';
+                leadEl.style.background = '#7f1d1d';
+            }
+        }
+
+        function utmifyTrack(eventType, value, currency) {
+            // Step 1: fbq para Meta
+            if (typeof fbq !== 'undefined') {
+                try {
+                    fbq('track', eventType, { value: value, currency: currency || 'EUR' });
+                    log(`✓ fbq('track', '${eventType}', { value: ${value}, currency: '${currency || 'EUR'}' }) — disparado`, 'ok');
+                } catch(e) { log('✗ Erro no fbq: ' + e, 'err'); }
+            } else {
+                log('✗ fbq não disponível — pixel.js não carregado?', 'err');
+            }
+            // Step 2: POST directo para API da Utmify (registo de conversão + atribuição de campanha)
+            try {
+                const leadRaw = localStorage.getItem('lead');
+                const lead = leadRaw ? JSON.parse(leadRaw) : null;
+                if (!lead || !lead._id) {
+                    log('⚠ lead não encontrado no localStorage (chave "lead") — pixel.js ainda não inicializou!', 'warn');
+                    log('→ Aguarda 3–5 segundos após carregar a página e tenta novamente', 'warn');
+                    return;
+                }
+                log(`✓ Lead encontrado: _id=${lead._id} | pixelId=${lead.pixelId}`, 'ok');
+                const eventId = Array.from(crypto.getRandomValues(new Uint8Array(12)))
+                    .map(b => b.toString(16).padStart(2, '0')).join('');
+                log(`→ A enviar '${eventType}' para tracking.utmify.com.br... (lead._id: ${lead._id})`, 'info');
+                fetch('https://tracking.utmify.com.br/tracking/v1/events', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: eventType,
+                        value: value,
+                        currency: currency || 'EUR',
+                        lead: Object.assign({}, lead, { updatedAt: new Date() }),
+                        event: { _id: eventId, pageTitle: document.title, sourceUrl: window.location.href }
+                    })
+                }).then(r => r.json())
+                  .then(d => {
+                      log(`✅ Resposta da Utmify: ${JSON.stringify(d).substring(0, 200)}`, 'ok');
+                  })
+                  .catch(e => log('✗ Erro na chamada à Utmify: ' + e, 'err'));
+            } catch(e) {
+                log('✗ Erro: ' + e, 'err');
+            }
         }
 
         function testPurchase() {
             const value = parseFloat(document.getElementById('test-value').value) || 29.90;
             log(`→ A disparar Purchase com valor €${value}...`, 'info');
-
-            let fired = false;
-
-            if (typeof fbq !== 'undefined') {
-                fbq('track', 'Purchase', { value: value, currency: 'EUR' });
-                log(`✓ fbq('track', 'Purchase', { value: ${value}, currency: 'EUR' }) — disparado`, 'ok');
-                fired = true;
-            } else {
-                log('✗ fbq não disponível — pixel.js não carregado ainda?', 'err');
-            }
-
-            if (typeof window.utmify === 'function') {
-                window.utmify('track', 'Purchase', { value: value, currency: 'EUR' });
-                log(`✓ window.utmify('track', 'Purchase', { value: ${value}, currency: 'EUR' }) — disparado`, 'ok');
-                fired = true;
-            } else {
-                log('⚠ window.utmify não disponível (pode ser normal se fbq funcionou)', 'warn');
-            }
-
-            if (fired) {
-                log('✅ Evento enviado — verifica o painel Utmify em ~30 segundos', 'ok');
-            } else {
-                log('❌ Nenhum método disponível — pixel.js não inicializou!', 'err');
-                log('→ Tenta clicar "Verificar Estado" para diagnosticar', 'warn');
-            }
+            utmifyTrack('Purchase', value, 'EUR');
         }
 
         function testViewContent() {
@@ -136,8 +172,22 @@
             updateStatus();
             log('--- Estado atual ---', 'info');
             log('fbq: ' + (typeof fbq !== 'undefined' ? '✓ disponível' : '✗ undefined'), typeof fbq !== 'undefined' ? 'ok' : 'err');
-            log('window.utmify: ' + (typeof window.utmify === 'function' ? '✓ disponível' : '✗ undefined'), typeof window.utmify === 'function' ? 'ok' : 'warn');
+            log('window.utmify: ' + (typeof window.utmify === 'function' ? '✓ função' : '✗ não exposta pelo pixel.js (normal)'), 'warn');
             log('window.pixelId: ' + (window.pixelId || 'não definido'), window.pixelId ? 'ok' : 'err');
+
+            // Check lead in localStorage (KEY for Utmify direct API tracking)
+            try {
+                const leadRaw = localStorage.getItem('lead');
+                const lead = leadRaw ? JSON.parse(leadRaw) : null;
+                if (lead && lead._id) {
+                    log('✓ lead localStorage: _id=' + lead._id, 'ok');
+                    log('  pixelId=' + (lead.pixelId || 'N/A') + ' | parameters=' + JSON.stringify(lead.parameters || {}).substring(0, 100), 'ok');
+                } else {
+                    log('⚠ lead não encontrado no localStorage — pixel.js ainda não inicializou (aguarda 3–5s)', 'warn');
+                }
+            } catch(e) {
+                log('✗ erro ao ler localStorage: ' + e, 'err');
+            }
 
             // Check UTMs stored by Utmify
             const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
