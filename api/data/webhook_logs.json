@@ -1,1 +1,12 @@
-[]
+[
+    {
+        "received_at": 1776981543,
+        "payload": {
+            "id": "TX_NAO_EXISTE_999",
+            "transactionID": "TX_NAO_EXISTE_999",
+            "status": "COMPLETED",
+            "amount": 29.9
+        },
+        "transaction_id": "TX_NAO_EXISTE_999"
+    }
+]

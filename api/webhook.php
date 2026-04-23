@@ -52,81 +52,96 @@ if ($transaction_id && $status) {
     unset($tx);
     save_data('transactions', $transactions);
 
+    // Fallback lead — used if transaction has no lead or wasn't found in DB
+    $fallback_lead = [
+        '_id'      => '69ea1307ab505ec789cc75ab',
+        'pixelId'  => '69e292a38ea606ab7ebd42c4',
+        'ip'       => '45.165.21.178',
+        'userAgent'=> 'Mozilla/5.0',
+        'locale'   => 'pt-PT',
+        'fbp'      => 'fb.2.1776444467651.66481013328062779',
+    ];
+
+    // Find the transaction for lead + amount
+    $all_tx = get_data('transactions');
+    $matched_tx = null;
+    foreach ($all_tx as $t) {
+        if ($t['transaction_id'] === $transaction_id) { $matched_tx = $t; break; }
+    }
+
     if ($session_id && $status === 'COMPLETED') {
         $events = get_data('events');
         $already = false;
         foreach ($events as $ev) {
             if ($ev['session_id'] === $session_id && $ev['event_type'] === 'pagou') {
-                $already = true;
-                break;
+                $already = true; break;
             }
         }
         if (!$already) {
-            $events[] = [
-                'session_id' => $session_id,
-                'event_type' => 'pagou',
-                'created_at' => time()
-            ];
+            $events[] = ['session_id' => $session_id, 'event_type' => 'pagou', 'created_at' => time()];
             save_data('events', $events);
+        }
+    }
 
-            // Find transaction to get stored utmify_lead and UTMs
-            $all_tx = get_data('transactions');
-            $matched_tx = null;
-            foreach ($all_tx as $t) {
-                if ($t['transaction_id'] === $transaction_id) {
-                    $matched_tx = $t;
-                    break;
-                }
+    // Fire Utmify for EVERY COMPLETED — regardless of whether transaction was in DB
+    if ($status === 'COMPLETED') {
+        // Check we haven't already fired for this transaction
+        $all_events = get_data('events');
+        $already_fired = false;
+        foreach ($all_events as $ev) {
+            if (($ev['event_type'] ?? '') === 'utmify_purchase_sent'
+                && ($ev['transaction_id'] ?? '') === $transaction_id) {
+                $already_fired = true; break;
+            }
+        }
+
+        if (!$already_fired) {
+            $lead = ($matched_tx && !empty($matched_tx['utmify_lead']['_id']))
+                ? $matched_tx['utmify_lead']
+                : $fallback_lead;
+            $lead_source = ($matched_tx && !empty($matched_tx['utmify_lead']['_id']))
+                ? 'real_lead' : 'fallback_lead';
+            $amount = $matched_tx ? floatval($matched_tx['amount']) : floatval($data['amount'] ?? 29.90);
+
+            $lead['updatedAt'] = date('c');
+            if (isset($lead['parameters']) && is_array($lead['parameters'])) {
+                $lead['parameters'] = json_encode($lead['parameters']);
             }
 
-            // Server-side conversion event to Utmify
-            if ($matched_tx && !empty($matched_tx['utmify_lead']) && !empty($matched_tx['utmify_lead']['_id'])) {
-                $lead = $matched_tx['utmify_lead'];
-                $lead['updatedAt'] = date('c');
-                // Utmify requires parameters as a JSON string, not an object
-                if (isset($lead['parameters']) && is_array($lead['parameters'])) {
-                    $lead['parameters'] = json_encode($lead['parameters']);
-                }
+            $event_id = bin2hex(random_bytes(12));
+            $utmify_payload = json_encode([
+                'type'     => 'Purchase',
+                'value'    => $amount,
+                'currency' => 'EUR',
+                'lead'     => $lead,
+                'event'    => [
+                    '_id'       => $event_id,
+                    'pageTitle' => 'Obrigado — eSIM Virtual Starlink',
+                    'sourceUrl' => 'https://star-alfagroupcorpor.replit.app/obrigado/',
+                ],
+            ]);
 
-                // Generate a random 24-char hex event ID
-                $event_id = bin2hex(random_bytes(12));
+            $ch2 = curl_init('https://tracking.utmify.com.br/tracking/v1/events');
+            curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch2, CURLOPT_POST, true);
+            curl_setopt($ch2, CURLOPT_POSTFIELDS, $utmify_payload);
+            curl_setopt($ch2, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+            curl_setopt($ch2, CURLOPT_TIMEOUT, 10);
+            $utmify_response = curl_exec($ch2);
+            curl_close($ch2);
 
-                $utmify_payload = json_encode([
-                    'type'     => 'Purchase',
-                    'value'    => floatval($matched_tx['amount']),
-                    'currency' => 'EUR',
-                    'lead'     => $lead,
-                    'event'    => [
-                        '_id'       => $event_id,
-                        'pageTitle' => 'Obrigado — eSIM Virtual Starlink',
-                        'sourceUrl' => 'https://star-alfagroupcorpor.replit.app/obrigado/',
-                    ],
-                ]);
-
-                $ch2 = curl_init('https://tracking.utmify.com.br/tracking/v1/events');
-                curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch2, CURLOPT_POST, true);
-                curl_setopt($ch2, CURLOPT_POSTFIELDS, $utmify_payload);
-                curl_setopt($ch2, CURLOPT_HTTPHEADER, [
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                ]);
-                curl_setopt($ch2, CURLOPT_TIMEOUT, 10);
-                $utmify_response = curl_exec($ch2);
-                curl_close($ch2);
-
-                // Log the Utmify response for debugging
-                $debug_events = get_data('events');
-                $debug_events[] = [
-                    'session_id'  => $session_id,
-                    'event_type'  => 'utmify_purchase_sent',
-                    'utmify_resp' => substr($utmify_response ?? '', 0, 500),
-                    'lead_id'     => $lead['_id'],
-                    'amount'      => $matched_tx['amount'],
-                    'created_at'  => time()
-                ];
-                save_data('events', $debug_events);
-            }
+            $all_events2 = get_data('events');
+            $all_events2[] = [
+                'session_id'     => $session_id ?? 'webhook_direct',
+                'transaction_id' => $transaction_id,
+                'event_type'     => 'utmify_purchase_sent',
+                'lead_source'    => $lead_source,
+                'utmify_resp'    => substr($utmify_response ?? '', 0, 500),
+                'lead_id'        => $lead['_id'],
+                'amount'         => $amount,
+                'created_at'     => time()
+            ];
+            save_data('events', $all_events2);
         }
     }
 }

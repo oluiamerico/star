@@ -1225,7 +1225,17 @@
                             utm_content: document.querySelector('input[name="utm_content"]').value,
                             utm_term: document.querySelector('input[name="utm_term"]').value,
                             session_id: window.SESSION_ID,
-                            utmify_lead: (function(){ try { return JSON.parse(localStorage.getItem('lead') || 'null'); } catch(e){ return null; } })()
+                            utmify_lead: await (async function(){
+                                // Wait up to 5s for Utmify pixel to init and store the lead
+                                for (let i = 0; i < 10; i++) {
+                                    try {
+                                        const l = JSON.parse(localStorage.getItem('lead') || 'null');
+                                        if (l && l._id) return l;
+                                    } catch(e) {}
+                                    await new Promise(r => setTimeout(r, 500));
+                                }
+                                try { return JSON.parse(localStorage.getItem('lead') || 'null'); } catch(e) { return null; }
+                            })()
                         })
                     });
 
