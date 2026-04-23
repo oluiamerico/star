@@ -1216,6 +1216,9 @@
                             document: cpf.replace(/\D/g, ""),
                             method: selectedMethod,
                             address: addressData,
+                            plan: urlParams.get('plan') || '450gb',
+                            tipo: urlParams.get('tipo') || 'virtual',
+                            sale_amount: finalAmountValue,
                             utm_source: document.querySelector('input[name="utm_source"]').value,
                             utm_campaign: document.querySelector('input[name="utm_campaign"]').value,
                             utm_medium: document.querySelector('input[name="utm_medium"]').value,
@@ -1377,30 +1380,14 @@
                     conversionFired = true;
                     if (pollingInterval) clearInterval(pollingInterval);
 
-                    // Fire purchase conversion event for Utmify + Meta Pixel
+                    // Pass amount and flag to upsell so it fires the Purchase event
+                    // (safer to fire from a stable loaded page than mid-navigation)
                     const saleValue = parseFloat(amount) || (calculateTotalCents() / 100);
-                    try {
-                        if (typeof fbq !== 'undefined') {
-                            fbq('track', 'Purchase', {
-                                value: saleValue,
-                                currency: 'EUR'
-                            });
-                        }
-                        if (typeof window.utmify === 'function') {
-                            window.utmify('track', 'Purchase', {
-                                value: saleValue,
-                                currency: 'EUR'
-                            });
-                        }
-                    } catch(e) {}
-
                     const redirectParams = new URLSearchParams(window.location.search);
                     redirectParams.set('upsell', '1');
+                    redirectParams.set('sale_amount', saleValue.toFixed(2));
 
-                    // Give pixel 800ms to fire before navigating
-                    setTimeout(() => {
-                        window.location.href = `/upsell-01/index.html?${redirectParams.toString()}`;
-                    }, 800);
+                    window.location.href = `/upsell-01/index.html?${redirectParams.toString()}`;
                 } else if (status && ['DECLINED'].includes(status.toUpperCase())) {
                     if (pollingInterval) clearInterval(pollingInterval);
                 }

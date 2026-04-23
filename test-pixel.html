@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste de Pixel — Utmify</title>
+    <script>
+        window.pixelId = "69e292a38ea606ab7ebd42c4";
+        var a = document.createElement("script");
+        a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+        a.setAttribute("async", "");
+        a.setAttribute("defer", "");
+        document.head.appendChild(a);
+    </script>
+    <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" async defer></script>
+    <style>
+        body { font-family: monospace; background: #0f0f0f; color: #eee; padding: 2rem; }
+        h1 { color: #fff; margin-bottom: 1rem; }
+        button { padding: 12px 24px; margin: 8px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .btn-test { background: #3b82f6; color: white; }
+        .btn-purchase { background: #22c55e; color: white; }
+        .btn-view { background: #f59e0b; color: black; }
+        .btn-clear { background: #6b7280; color: white; }
+        #log { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 1rem; margin-top: 1rem; min-height: 200px; max-height: 500px; overflow-y: auto; font-size: 13px; }
+        .ok { color: #22c55e; }
+        .err { color: #ef4444; }
+        .info { color: #60a5fa; }
+        .warn { color: #f59e0b; }
+        .section { margin: 1.5rem 0; padding: 1rem; background: #1a1a1a; border-radius: 8px; }
+        label { display: block; margin-bottom: 4px; color: #9ca3af; font-size: 12px; }
+        input { background: #2a2a2a; border: 1px solid #444; color: #eee; padding: 8px 12px; border-radius: 4px; margin-right: 8px; font-family: monospace; }
+        .status-row { display: flex; gap: 2rem; margin-bottom: 1rem; }
+        .status-item { padding: 8px 16px; border-radius: 6px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <h1>🔬 Teste de Pixel — Utmify</h1>
+
+    <div class="section">
+        <h3 style="margin:0 0 0.5rem 0">Estado do Pixel</h3>
+        <div class="status-row">
+            <div class="status-item" id="status-fbq" style="background:#333">fbq: verificando...</div>
+            <div class="status-item" id="status-utmify" style="background:#333">utmify: verificando...</div>
+            <div class="status-item" id="status-pixelid" style="background:#333">pixelId: verificando...</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 style="margin:0 0 0.5rem 0">Disparar Eventos de Teste</h3>
+        <div style="margin-bottom:1rem">
+            <label>Valor da venda (€)</label>
+            <input type="number" id="test-value" value="29.90" step="0.01" style="width:120px">
+        </div>
+        <button class="btn-purchase" onclick="testPurchase()">🛒 Disparar Purchase</button>
+        <button class="btn-view" onclick="testViewContent()">👁 Disparar ViewContent</button>
+        <button class="btn-test" onclick="testInitCheck()">🔍 Verificar Estado</button>
+        <button class="btn-clear" onclick="clearLog()">🗑 Limpar Log</button>
+    </div>
+
+    <div id="log"><span class="info">Aguardando ação...</span></div>
+
+    <script>
+        const logEl = document.getElementById('log');
+        function log(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString('pt-PT', { hour12: false });
+            const line = document.createElement('div');
+            line.innerHTML = `<span style="color:#666">[${time}]</span> <span class="${type}">${msg}</span>`;
+            logEl.appendChild(line);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function updateStatus() {
+            const fbqEl = document.getElementById('status-fbq');
+            const utmEl = document.getElementById('status-utmify');
+            const pidEl = document.getElementById('status-pixelid');
+
+            if (typeof fbq !== 'undefined') {
+                fbqEl.textContent = 'fbq: ✓ disponível';
+                fbqEl.style.background = '#166534';
+            } else {
+                fbqEl.textContent = 'fbq: ✗ não encontrado';
+                fbqEl.style.background = '#7f1d1d';
+            }
+
+            if (typeof window.utmify === 'function') {
+                utmEl.textContent = 'window.utmify: ✓ disponível';
+                utmEl.style.background = '#166534';
+            } else {
+                utmEl.textContent = 'window.utmify: ✗ não encontrado';
+                utmEl.style.background = '#7f1d1d';
+            }
+
+            pidEl.textContent = 'pixelId: ' + (window.pixelId || 'não definido');
+            pidEl.style.background = window.pixelId ? '#1e3a5f' : '#7f1d1d';
+        }
+
+        function testPurchase() {
+            const value = parseFloat(document.getElementById('test-value').value) || 29.90;
+            log(`→ A disparar Purchase com valor €${value}...`, 'info');
+
+            let fired = false;
+
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'Purchase', { value: value, currency: 'EUR' });
+                log(`✓ fbq('track', 'Purchase', { value: ${value}, currency: 'EUR' }) — disparado`, 'ok');
+                fired = true;
+            } else {
+                log('✗ fbq não disponível — pixel.js não carregado ainda?', 'err');
+            }
+
+            if (typeof window.utmify === 'function') {
+                window.utmify('track', 'Purchase', { value: value, currency: 'EUR' });
+                log(`✓ window.utmify('track', 'Purchase', { value: ${value}, currency: 'EUR' }) — disparado`, 'ok');
+                fired = true;
+            } else {
+                log('⚠ window.utmify não disponível (pode ser normal se fbq funcionou)', 'warn');
+            }
+
+            if (fired) {
+                log('✅ Evento enviado — verifica o painel Utmify em ~30 segundos', 'ok');
+            } else {
+                log('❌ Nenhum método disponível — pixel.js não inicializou!', 'err');
+                log('→ Tenta clicar "Verificar Estado" para diagnosticar', 'warn');
+            }
+        }
+
+        function testViewContent() {
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'ViewContent');
+                log('✓ fbq ViewContent disparado', 'ok');
+            } else {
+                log('✗ fbq não disponível', 'err');
+            }
+        }
+
+        function testInitCheck() {
+            updateStatus();
+            log('--- Estado atual ---', 'info');
+            log('fbq: ' + (typeof fbq !== 'undefined' ? '✓ disponível' : '✗ undefined'), typeof fbq !== 'undefined' ? 'ok' : 'err');
+            log('window.utmify: ' + (typeof window.utmify === 'function' ? '✓ disponível' : '✗ undefined'), typeof window.utmify === 'function' ? 'ok' : 'warn');
+            log('window.pixelId: ' + (window.pixelId || 'não definido'), window.pixelId ? 'ok' : 'err');
+
+            // Check UTMs stored by Utmify
+            const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+            let foundUtm = false;
+            keys.forEach(k => {
+                const val = localStorage.getItem(k) || sessionStorage.getItem(k) ||
+                    document.cookie.split(';').find(c => c.trim().startsWith(k + '='))?.split('=')[1];
+                if (val) {
+                    log(`${k}: ${val}`, 'ok');
+                    foundUtm = true;
+                }
+            });
+            if (!foundUtm) log('Nenhum UTM encontrado no storage (normal se não chegaste por campanha)', 'warn');
+        }
+
+        function clearLog() {
+            logEl.innerHTML = '<span class="info">Log limpo.</span>';
+        }
+
+        // Auto-check status every 2s until pixel loads
+        let checkCount = 0;
+        const statusInterval = setInterval(() => {
+            updateStatus();
+            checkCount++;
+            if (checkCount > 10 || typeof fbq !== 'undefined') {
+                clearInterval(statusInterval);
+                if (typeof fbq !== 'undefined') {
+                    log('✅ Pixel carregado e pronto para disparar eventos!', 'ok');
+                } else {
+                    log('⚠ Pixel ainda não carregou após 20s — possível problema de rede ou ID inválido', 'warn');
+                }
+            }
+        }, 2000);
+
+        updateStatus();
+        log('Página carregada. Pixel a inicializar...', 'info');
+    </script>
+</body>
+</html>

@@ -67,7 +67,25 @@ try {
 
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $payload_data['success_url'] = $protocol . '://' . $host . '/upsell-01/index.html';
+
+    // Build success_url with all params needed for conversion tracking
+    $plan        = isset($input['plan']) ? preg_replace('/[^a-zA-Z0-9]/', '', $input['plan']) : '450gb';
+    $tipo        = isset($input['tipo']) ? preg_replace('/[^a-zA-Z0-9]/', '', $input['tipo']) : 'virtual';
+    $sale_amount = isset($input['sale_amount']) ? number_format(floatval($input['sale_amount']), 2, '.', '') : number_format($amount, 2, '.', '');
+
+    $success_params = http_build_query(array_filter([
+        'upsell'       => '1',
+        'plan'         => $plan,
+        'tipo'         => $tipo,
+        'sale_amount'  => $sale_amount,
+        'utm_source'   => $input['utm_source']   ?? '',
+        'utm_campaign' => $input['utm_campaign'] ?? '',
+        'utm_medium'   => $input['utm_medium']   ?? '',
+        'utm_content'  => $input['utm_content']  ?? '',
+        'utm_term'     => $input['utm_term']     ?? '',
+    ]));
+
+    $payload_data['success_url'] = $protocol . '://' . $host . '/upsell-01/index.html?' . $success_params;
     $payload_data['webhook_url'] = $protocol . '://' . $host . '/api/webhook.php';
 
     $order_url = 'https://api.waymb.com/transactions/create';

@@ -407,12 +407,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            if (typeof fbq !== 'undefined') fbq('track', 'ViewContent');
-
             const params = new URLSearchParams(window.location.search);
             const tipo = params.get('tipo') || 'virtual';
             const plan = params.get('plan') || '450gb';
             const isFisico = tipo === 'fisico';
+            const isFromPurchase = params.get('upsell') === '1';
 
             // Dynamically set content based on what they bought
             const titleEl = document.getElementById('upsell-title');
@@ -427,10 +426,34 @@
             const btnAcceptLabel = document.getElementById('btn-accept-label');
             const btnDeclineLabel = document.getElementById('btn-decline-label');
 
-            let purchasedPrice = 29.90;
-            if (plan === '150gb') purchasedPrice = 19.90;
-            else if (plan === '600gb') purchasedPrice = 39.90;
-            if (tipo === 'fisico') purchasedPrice += 9.99;
+            let purchasedPrice = parseFloat(params.get('sale_amount')) || 29.90;
+            if (!params.get('sale_amount')) {
+                if (plan === '150gb') purchasedPrice = 19.90;
+                else if (plan === '600gb') purchasedPrice = 39.90;
+                if (tipo === 'fisico') purchasedPrice += 9.99;
+            }
+
+            // Fire main purchase conversion here — page is stable, pixel is fully loaded
+            function fireMainPurchase() {
+                try {
+                    if (typeof fbq !== 'undefined') {
+                        fbq('track', 'Purchase', { value: purchasedPrice, currency: 'EUR' });
+                    }
+                    if (typeof window.utmify === 'function') {
+                        window.utmify('track', 'Purchase', { value: purchasedPrice, currency: 'EUR' });
+                    }
+                    console.log('[Tracking] Purchase fired — value:', purchasedPrice, 'EUR');
+                } catch(e) {
+                    console.error('[Tracking] Purchase error:', e);
+                }
+            }
+
+            if (isFromPurchase) {
+                // Wait 1.5s for pixel.js to fully initialize before firing
+                setTimeout(fireMainPurchase, 1500);
+            } else {
+                if (typeof fbq !== 'undefined') fbq('track', 'ViewContent');
+            }
 
             const upsellAmount = "9.90";
             const originalPrice = "29.90";
