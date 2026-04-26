@@ -701,7 +701,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-foreground">Cartão SIM Starlink <span id="plan-name-text">450
+                                <h4 class="font-semibold text-foreground">Cartão SIM Starlink <span id="plan-name-text">150
                                         GB</span></h4>
                                 <p class="text-sm text-muted-foreground">Direct-to-Cell</p>
                                 <p class="text-sm text-muted-foreground">Plano mensal</p>
@@ -770,8 +770,8 @@
                         <div class="border-t border-border my-6"></div>
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between text-sm"><span class="text-muted-foreground">Compra do Cartão SIM
-                                    (<span id="plan-gb-text">450 GB</span>)</span><span class="text-foreground">€ <span
-                                        id="plan-price-text1">29,90</span></span></div>
+                                    (<span id="plan-gb-text">150 GB</span>)</span><span class="text-foreground">€ <span
+                                        id="plan-price-text1">19,90</span></span></div>
                             <div class="flex justify-between text-sm" id="shipping-row"><span
                                     class="text-muted-foreground">Taxa de
                                     envio</span><span id="shipping-value"
@@ -806,7 +806,7 @@
                         <div class="flex justify-between items-baseline mb-6"><span
                                 class="text-foreground font-medium">Total hoje:</span>
                             <div class="text-right"><span class="text-2xl font-bold text-foreground">€ <span
-                                        id="plan-price-text2">29,90</span></span>
+                                        id="plan-price-text2">19,90</span></span>
                             </div>
                         </div>
 
@@ -840,7 +840,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const plan = urlParams.get('plan') || '450gb';
+            const plan = urlParams.get('plan') || '150gb';
             let planNameValue = plan.toUpperCase().replace('GB', ' GB');
             if (plan === '450gb') planNameValue = '450 GB'; // fallback case
             
@@ -849,7 +849,7 @@
             const isFisico = tipo === 'fisico';
             
             function calculateTotalCents() {
-                let baseAmount = 2990; // 450gb original
+                let baseAmount = 1990; // 150gb default
                 if (plan === '150gb') baseAmount = 1990;
                 else if (plan === '600gb') baseAmount = 3990;
 

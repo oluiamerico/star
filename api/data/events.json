@@ -104,5 +104,10 @@
         "lead_id": "69ea1307ab505ec789cc75ab",
         "amount": 29.9,
         "created_at": 1776981543
+    },
+    {
+        "session_id": "78073782-058a-4022-8cc7-6d1fab98b9cb",
+        "event_type": "index",
+        "created_at": 1777169523
     }
 ]
