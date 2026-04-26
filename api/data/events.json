@@ -109,5 +109,10 @@
         "session_id": "78073782-058a-4022-8cc7-6d1fab98b9cb",
         "event_type": "index",
         "created_at": 1777169523
+    },
+    {
+        "session_id": "a78727d1-ad9b-4fda-b0fe-56ead0259cbc",
+        "event_type": "index",
+        "created_at": 1777223059
     }
 ]

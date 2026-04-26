@@ -39,6 +39,13 @@
     </script>
     <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck
         data-utmify-prevent-subids async defer></script>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "whtdckx3fs");
+    </script>
 </head>
 
 <body class="font-sans antialiased">
@@ -98,10 +105,10 @@
                 <p class="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 text-pretty">Transforme seu
                     smartphone em um modem via satélite. Com mais de 7.000 satélites em órbita baixa, a Starlink leva
                     conectividade para onde as redes tradicionais não chegam.</p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4"><a href="#ativar"
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4"><a href="#como-funciona"
                         data-slot="button"
                         class="inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive rounded-md has-[>svg]:px-4 bg-foreground text-background hover:bg-foreground/90 font-semibold text-lg px-8 py-6 h-auto group"
-                        onclick="if(window.innerWidth < 768) { window.location.hash = 'ativar'; return false; }">Saiba
+                        onclick="if(typeof fbq !== 'undefined') fbq('track', 'ViewContent');">Saiba
                         Como Funciona<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round"
@@ -569,7 +576,7 @@
                             Meses de Uso Grátis</span></div>
                     <div class="grid md:grid-cols-3 gap-6">
                         <div data-plan="150gb"
-                            class="relative p-6 rounded-2xl bg-background border-2 cursor-pointer transition-all border-foreground shadow-lg shadow-foreground/20 plan-card active">
+                            class="relative p-6 rounded-2xl bg-background border-2 cursor-pointer transition-all border-border hover:border-foreground/50 plan-card">
                             <div class="bg-foreground text-background rounded-lg px-4 py-2 inline-block mb-4"><span
                                     class="text-xl font-bold">150 GB</span></div>
                             <div class="mb-6">
@@ -614,11 +621,11 @@
                                 </li>
                             </ul>
                             <div
-                                class="selecionar-btn w-full py-2 rounded-lg text-center text-sm font-medium transition-colors bg-foreground text-background">
-                                Selecionado</div>
+                                class="selecionar-btn w-full py-2 rounded-lg text-center text-sm font-medium transition-colors bg-foreground/5 text-muted-foreground">
+                                Selecionar</div>
                         </div>
                         <div data-plan="450gb"
-                            class="relative p-6 rounded-2xl bg-background border-2 cursor-pointer transition-all border-border hover:border-foreground/50 plan-card">
+                            class="relative p-6 rounded-2xl bg-background border-2 cursor-pointer transition-all border-foreground shadow-lg shadow-foreground/20 plan-card active">
                             <div class="absolute -top-3 left-1/2 -translate-x-1/2"><span
                                     class="bg-foreground text-background px-4 py-1 rounded-full text-xs font-semibold">Mais
                                     Popular</span></div>
@@ -666,8 +673,8 @@
                                 </li>
                             </ul>
                             <div
-                                class="selecionar-btn w-full py-2 rounded-lg text-center text-sm font-medium transition-colors bg-foreground/5 text-muted-foreground">
-                                Selecionar</div>
+                                class="selecionar-btn w-full py-2 rounded-lg text-center text-sm font-medium transition-colors bg-foreground text-background">
+                                Selecionado</div>
                         </div>
                         <div data-plan="600gb"
                             class="relative p-6 rounded-2xl bg-background border-2 cursor-pointer transition-all border-border hover:border-foreground/50 plan-card">
@@ -739,7 +746,7 @@
                                     class="w-10 h-10 rounded-full bg-foreground text-background font-bold flex items-center justify-center mx-auto mb-3">
                                     1</div>
                                 <p class="text-foreground font-semibold mb-1">Compra do Cartão SIM</p>
-                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-1">19,90</span></p>
+                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-1">29,90</span></p>
                                 <p class="text-muted-foreground text-sm mt-1">Valor do cartão SIM escolhido pago agora</p>
                             </div>
                             <div class="p-4">
@@ -755,7 +762,7 @@
                                     class="w-10 h-10 rounded-full bg-foreground text-background font-bold flex items-center justify-center mx-auto mb-3">
                                     3</div>
                                 <p class="text-foreground font-semibold mb-1">Após 2 Meses</p>
-                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-3">19,90</span></p>
+                                <p class="text-2xl font-bold text-foreground">€ <span id="payment-price-step-3">29,90</span></p>
                                 <p class="text-muted-foreground text-sm mt-1">Primeira mensalidade do plano</p>
                             </div>
                         </div>
@@ -764,7 +771,7 @@
                             quando quiser.</p>
                     </div>
                     <div class="mt-10 text-center" id="desktop-cta-container">
-                        <a href="./escolher-chip/index.html?plan=150gb" id="main-cta-btn" data-slot="button"
+                        <a href="./escolher-chip/index.html?plan=450gb" id="main-cta-btn" data-slot="button"
                             class="inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive rounded-md has-[>svg]:px-4 bg-foreground text-background hover:bg-foreground/90 font-semibold text-lg px-12 py-6 h-auto group"
                             onclick="if(typeof fbq !== 'undefined') fbq('track', 'ViewContent');">Comprar
                             Cartão SIM Agora<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -827,7 +834,7 @@
     <!-- Mobile Sticky CTA -->
     <div id="mobile-sticky-cta" style="display:none;" class="fixed bottom-0 left-0 right-0 z-50 md:hidden">
         <div style="background: rgba(10,10,10,0.85); backdrop-filter: blur(12px); border-top: 1px solid rgba(255,255,255,0.1);" class="px-4 py-3">
-            <a href="./escolher-chip/index.html?plan=150gb" id="mobile-cta-btn"
+            <a href="./escolher-chip/index.html?plan=450gb" id="mobile-cta-btn"
                 onclick="if(typeof fbq !== 'undefined') fbq('track', 'ViewContent');"
                 class="flex items-center justify-center gap-2 w-full rounded-xl font-bold text-base py-4"
                 style="background: #fff; color: #000; transition: opacity 0.2s;">
@@ -856,7 +863,7 @@
                 '600gb': '39,90'
             };
 
-            // Show sticky bar on mobile immediately since 150gb is default active
+            // Show sticky bar on mobile immediately since 450gb is default active
             if (window.innerWidth < 768) {
                 mobileStickyBar.style.display = 'block';
                 mobileStickyBar.style.animation = 'slideUp 0.3s ease';
@@ -903,7 +910,7 @@
                     }
 
                     // Update payment section prices
-                    const newPrice = prices[plan] || '19,90';
+                    const newPrice = prices[plan] || '29,90';
                     if (priceStep1) priceStep1.innerText = newPrice;
                     if (priceStep3) priceStep3.innerText = newPrice;
                 });
