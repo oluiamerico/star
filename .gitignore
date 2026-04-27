@@ -1,3 +1,9 @@
 node_modules/
 .DS_Store
 *.log
+
+# Ficheiros de dados em tempo real (gerados pelo servidor)
+api/data/sessions.json
+api/data/events.json
+api/data/transactions.json
+api/data/webhook_logs.json
