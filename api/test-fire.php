@@ -39,42 +39,68 @@ if (!$lead || empty($lead['_id'])) {
 // Last resort: hardcoded known-good lead for this pixel (confirmed working Apr 23 2026)
 if (!$lead || empty($lead['_id'])) {
     $lead = [
-        '_id'      => '69ea1307ab505ec789cc75ab',
-        'pixelId'  => '69b5d2cef247cc4b40527718',
+        '_id'      => bin2hex(random_bytes(12)),
+        'pixelId'  => '69e292a38ea606ab7ebd42c4',
+        'name'     => 'Teste Antigravity',
+        'email'    => 'teste' . rand(100, 999) . '@exemplo.com',
+        'phone'    => '351910000000',
         'ip'       => '45.165.21.178',
         'userAgent'=> 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'locale'   => 'pt-PT',
         'fbp'      => 'fb.2.1776444467651.66481013328062779',
     ];
-    $leadSource = 'hardcoded_fallback';
+    $leadSource = 'hardcoded_random_customer_fallback';
 }
 
-$lead['updatedAt'] = date('c');
-// Utmify requires parameters as a JSON string, not an object
-if (isset($lead['parameters']) && is_array($lead['parameters'])) {
-    $lead['parameters'] = json_encode($lead['parameters']);
-}
-$event_id = bin2hex(random_bytes(12));
+$token = 'ryGFU6OxRZBIyHdPaW9wx05t2RKcjFZawQqD';
+$order_id = 'test_' . bin2hex(random_bytes(6));
+$price_in_cents = round($amount * 100);
 
 $payload = json_encode([
-    'type'     => 'Purchase',
-    'value'    => $amount,
-    'currency' => 'EUR',
-    'lead'     => $lead,
-    'event'    => [
-        '_id'       => $event_id,
-        'pageTitle' => 'Obrigado — eSIM Virtual Starlink',
-        'sourceUrl' => 'https://global-satelite.shop/obrigado/',
+    'orderId'       => $order_id,
+    'platform'      => 'custom',
+    'paymentMethod' => 'pix',
+    'status'        => 'paid',
+    'createdAt'     => date('Y-m-d H:i:s'),
+    'approvedDate'  => date('Y-m-d H:i:s'),
+    'customer' => [
+        'name'     => 'Teste Antigravity',
+        'email'    => 'teste' . rand(100, 999) . '@exemplo.com',
+        'phone'    => '351910000000',
+        'document' => '999999999',
+        'country'  => 'PT',
+        'ip'       => '45.165.21.178'
     ],
+    'products' => [[
+        'id'           => 'starlink_esim_test',
+        'name'         => 'Starlink eSIM',
+        'planId'       => 'standard',
+        'planName'     => 'Standard Plan',
+        'quantity'     => 1,
+        'priceInCents' => $price_in_cents
+    ]],
+    'trackingParameters' => [
+        'utm_source'   => 'google',
+        'utm_medium'   => 'cpc',
+        'utm_campaign' => 'teste_api_v1',
+        'utm_content'  => null,
+        'utm_term'     => null
+    ],
+    'commission' => [
+        'totalPriceInCents'      => $price_in_cents,
+        'gatewayFeeInCents'      => 0,
+        'userCommissionInCents'  => $price_in_cents
+    ],
+    'isTest' => false
 ]);
 
-$ch = curl_init('https://tracking.utmify.com.br/tracking/v1/events');
+$ch = curl_init('https://api.utmify.com.br/api-credentials/orders');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Content-Type: application/json',
-    'Accept: application/json',
+    'x-api-token: ' . $token
 ]);
 curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 $resp     = curl_exec($ch);
@@ -90,9 +116,8 @@ echo json_encode([
     'utmify_raw' => $resp,
     'utmify_obj' => json_decode($resp, true),
     'sent'       => [
-        'lead_id'    => $lead['_id'],
+        'order_id'   => $order_id,
         'amount'     => $amount,
-        'event_id'   => $event_id,
-        'lead_source'=> $leadSource,
+        'endpoint'   => 'api-credentials/orders',
     ],
 ]);

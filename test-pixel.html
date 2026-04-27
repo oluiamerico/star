@@ -63,8 +63,8 @@
         <button class="btn-test" onclick="testInitCheck()">🔍 Verificar Estado</button>
         <button class="btn-clear" onclick="clearLog()">🗑 Limpar Log</button>
         <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid #333">
-            <div style="color:#f59e0b;font-size:12px;margin-bottom:8px">TESTE SERVIDOR → Utmify (simula webhook WayMB COMPLETED)</div>
-            <button style="background:#7c3aed;color:white;padding:12px 24px;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-size:14px" onclick="testServerFire()">🚀 Disparar Purchase SERVER-SIDE</button>
+            <div style="color:#7c3aed;font-size:12px;margin-bottom:8px">NOVA API OFICIAL → Utmify Orders v1 (Simula Venda Real)</div>
+            <button style="background:#7c3aed;color:white;padding:12px 24px;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-size:14px" onclick="testServerFire()">🚀 Disparar Pedido via API v1 (Orders)</button>
         </div>
     </div>
 
@@ -190,7 +190,7 @@
             } else {
                 log(`✓ Lead localStorage: _id=${lead._id}`, 'ok');
             }
-            log(`→ A enviar Purchase €${value} para servidor PHP → Utmify...`, 'info');
+            log(`→ Enviando Pedido €${value} para API Utmify (api-credentials/orders)...`, 'info');
 
             try {
                 const resp = await fetch('/api/test-fire.php?s=fire2026', {
@@ -202,10 +202,9 @@
 
                 if (d.success) {
                     log(`✅ Utmify confirmou! HTTP ${d.http_code}`, 'ok');
-                    log(`   lead._id enviado: ${d.sent.lead_id}`, 'ok');
-                    log(`   lead_source: ${d.sent.lead_source}`, 'ok');
-                    log(`   event_id: ${d.sent.event_id}`, 'ok');
-                    log(`   Resposta: ${JSON.stringify(d.utmify_obj || d.utmify_raw).substring(0,300)}`, 'ok');
+                    log(`   order_id enviado: ${d.sent.order_id}`, 'ok');
+                    log(`   Resultado: ${d.utmify_obj.result || 'SUCCESS'}`, 'ok');
+                    log(`   Resposta API: ${JSON.stringify(d.utmify_obj).substring(0,300)}`, 'ok');
                     log('→ Verifica o painel Utmify em 30-60 segundos', 'warn');
                 } else {
                     log(`✗ Falhou: ${d.error || JSON.stringify(d)}`, 'err');

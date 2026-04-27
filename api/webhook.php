@@ -96,36 +96,60 @@ if ($transaction_id && $status) {
         }
 
         if (!$already_fired) {
+            $token = 'ryGFU6OxRZBIyHdPaW9wx05t2RKcjFZawQqD';
+            $price_in_cents = round($amount * 100);
+            
             $lead = ($matched_tx && !empty($matched_tx['utmify_lead']['_id']))
                 ? $matched_tx['utmify_lead']
                 : $fallback_lead;
-            $lead_source = ($matched_tx && !empty($matched_tx['utmify_lead']['_id']))
-                ? 'real_lead' : 'fallback_lead';
-            $amount = $matched_tx ? floatval($matched_tx['amount']) : floatval($data['amount'] ?? 29.90);
 
-            $lead['updatedAt'] = date('c');
-            if (isset($lead['parameters']) && is_array($lead['parameters'])) {
-                $lead['parameters'] = json_encode($lead['parameters']);
-            }
-
-            $event_id = bin2hex(random_bytes(12));
-            $utmify_payload = json_encode([
-                'type'     => 'Purchase',
-                'value'    => $amount,
-                'currency' => 'EUR',
-                'lead'     => $lead,
-                'event'    => [
-                    '_id'       => $event_id,
-                    'pageTitle' => 'Obrigado — eSIM Virtual Starlink',
-                    'sourceUrl' => 'https://global-satelite.shop/obrigado/',
+            $payload = json_encode([
+                'orderId'       => $transaction_id,
+                'platform'      => 'waymb',
+                'paymentMethod' => strtolower($data['method'] ?? ($matched_tx['method'] ?? 'pix')),
+                'status'        => 'paid',
+                'createdAt'     => date('Y-m-d H:i:s'),
+                'approvedDate'  => date('Y-m-d H:i:s'),
+                'customer' => [
+                    'name'     => $data['payer']['name'] ?? ($matched_tx['customer_name'] ?? 'Cliente Starlink'),
+                    'email'    => $data['payer']['email'] ?? ($matched_tx['customer_email'] ?? 'cliente@exemplo.com'),
+                    'phone'    => preg_replace('/\D/', '', $data['payer']['phone'] ?? ($matched_tx['customer_phone'] ?? '')),
+                    'document' => preg_replace('/\D/', '', $data['payer']['document'] ?? ($matched_tx['customer_document'] ?? '')),
+                    'country'  => 'PT',
+                    'ip'       => $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1'
                 ],
+                'products' => [[
+                    'id'           => 'starlink_esim',
+                    'name'         => 'Starlink eSIM',
+                    'planId'       => 'standard',
+                    'planName'     => 'Standard Plan',
+                    'quantity'     => 1,
+                    'priceInCents' => $price_in_cents
+                ]],
+                'trackingParameters' => [
+                    'utm_source'   => $matched_tx['utm_source']   ?? null,
+                    'utm_medium'   => $matched_tx['utm_medium']   ?? null,
+                    'utm_campaign' => $matched_tx['utm_campaign'] ?? null,
+                    'utm_content'  => $matched_tx['utm_content']  ?? null,
+                    'utm_term'     => $matched_tx['utm_term']     ?? null,
+                    'src'          => $matched_tx['utm_source']   ?? null
+                ],
+                'commission' => [
+                    'totalPriceInCents'      => $price_in_cents,
+                    'gatewayFeeInCents'      => 0,
+                    'userCommissionInCents'  => $price_in_cents
+                ],
+                'isTest' => false
             ]);
 
-            $ch2 = curl_init('https://tracking.utmify.com.br/tracking/v1/events');
+            $ch2 = curl_init('https://api.utmify.com.br/api-credentials/orders');
             curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch2, CURLOPT_POST, true);
-            curl_setopt($ch2, CURLOPT_POSTFIELDS, $utmify_payload);
-            curl_setopt($ch2, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+            curl_setopt($ch2, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch2, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'x-api-token: ' . $token
+            ]);
             curl_setopt($ch2, CURLOPT_TIMEOUT, 10);
             $utmify_response = curl_exec($ch2);
             curl_close($ch2);
@@ -135,9 +159,8 @@ if ($transaction_id && $status) {
                 'session_id'     => $session_id ?? 'webhook_direct',
                 'transaction_id' => $transaction_id,
                 'event_type'     => 'utmify_purchase_sent',
-                'lead_source'    => $lead_source,
+                'lead_source'    => $matched_tx ? 'real_lead' : 'fallback',
                 'utmify_resp'    => substr($utmify_response ?? '', 0, 500),
-                'lead_id'        => $lead['_id'],
                 'amount'         => $amount,
                 'created_at'     => time()
             ];
