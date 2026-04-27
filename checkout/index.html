@@ -856,8 +856,9 @@
             const isFisico = tipo === 'fisico';
             
             function calculateTotalCents() {
-                let baseAmount = 2990; // 450gb original
+                let baseAmount = 2990; // 450gb default
                 if (plan === '150gb') baseAmount = 1990;
+                else if (plan === '450gb') baseAmount = 2990;
                 else if (plan === '600gb') baseAmount = 3990;
 
                 let shipping = isFisico ? 999 : 0;
